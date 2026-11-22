@@ -697,7 +697,7 @@ function copyReferral(){authClient?.auth.getSession().then(({data})=>{const code
 function copyReferralLink(){authClient?.auth.getSession().then(({data})=>{const code=referralCodeFor(data?.session?.user);if(!code){say("Please sign in to get your personal referral link.");return;}const link=location.origin+location.pathname+"?ref="+encodeURIComponent(code)+"&page=home";navigator.clipboard?.writeText(link).then(()=>say("Referral link copied!"),()=>say("Your referral link is "+link));});}
 let promoteFilter="All",profilePromoGoals={};
 const promotionGoals=["Creator profile spotlight","Content discovery","Collaboration invitation","Content feedback"];
-async async function loadProfilePromotions(){
+async function loadProfilePromotions(){
  const box=document.getElementById("profilePromotionList");if(!box)return;
  const timeout=(promise,ms,label)=>Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+" timed out")),ms))]);
  if(!authClient){box.textContent="Sign in to manage promotions.";return;}
@@ -754,7 +754,7 @@ async function toggleProfilePromotion(button){
 }
 document.getElementById("profilePromotionList")?.addEventListener("click",e=>{const b=e.target.closest("[data-promo-toggle]");if(b)toggleProfilePromotion(b);});
 document.getElementById("profilePromotionList")?.addEventListener("change",e=>{const s=e.target.closest("[data-promo-goal]");if(s){profilePromoGoals[s.dataset.promoGoal]=s.value;loadProfilePromotions();}});
-async async function showCampaigns(){
+async function showCampaigns(){
  const el=document.getElementById("campaignBoard");if(!el)return;
  if(!authClient){el.innerHTML='<div class="muted">Sign in to manage your campaigns.</div>';return;}
  const {data,error}=await authClient.rpc("my_creatorboost_campaigns_v2");if(error){el.innerHTML='<div class="muted">Campaigns unavailable. Please sign in and try again.</div>';return;}
