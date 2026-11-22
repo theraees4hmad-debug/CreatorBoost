@@ -695,23 +695,38 @@ let promoteFilter="All",profilePromoGoals={};
 const promotionGoals=["Followers / subscribers","Likes","Comments","Views"];
 async function loadProfilePromotions(){
  const box=document.getElementById("profilePromotionList");if(!box)return;
+ const timeout=(promise,ms,label)=>Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+" timed out")),ms))]);
  if(!authClient){box.textContent="Sign in to manage promotions.";return;}
- const {data:{user},error:userError}=await authClient.auth.getUser();
- if(userError||!user){box.textContent="Sign in to manage promotions.";return;}
- const links=user.user_metadata?.creatorboost_profile?.links||{},entries=Object.entries(links).filter(([,url])=>url);
- // YouTube OAuth connections are stored securely in their own table, not in user metadata.
- // Include the authorized channel in Promote so it appears alongside manually saved profile links.
- if(!entries.some(([p])=>p==="YouTube")){
-  try{const {data:yt,error:ytError}=await authClient.functions.invoke("youtube-connection-status");if(!ytError&&yt?.connected&&yt.channel?.channel_id){entries.push(["YouTube","https://www.youtube.com/channel/"+yt.channel.channel_id]);}}
-  catch(e){console.warn("Could not load YouTube promotion account",e);}
- }
- if(!entries.length){box.innerHTML='No social accounts added yet. Add public profile links in <a href="?page=profile" onclick="event.preventDefault();showPage(\'profile\')">Profile</a> or authorize YouTube there.';return;}
- const {data:campaigns,error}=await authClient.rpc("my_creatorboost_campaigns_v2");
- if(error){box.textContent="Could not load promotion status. Please try again.";return;}
- const mine=(campaigns||[]).filter(x=>x.is_mine);
- box.innerHTML=entries.map(([platform,url])=>{
+ box.innerHTML='<div class="small">Checking your saved accounts…</div>';
+ try{
+  // Read the cached auth session first; do not wait on a network getUser() call to render saved profile links.
+  const sessionResult=await timeout(authClient.auth.getSession(),5000,"Account check");
+  const user=sessionResult?.data?.session?.user;
+  if(sessionResult?.error||!user){box.textContent="Please sign in again to manage promotions.";return;}
+  const links=user.user_metadata?.creatorboost_profile?.links||{};
+  const entries=Object.entries(links).filter(([,url])=>typeof url==="string"&&url.trim());
+  // Render saved social links immediately. YouTube authorization is checked separately below.
+  if(!entries.length)box.innerHTML='<div class="small">Checking for authorized YouTube…</div>';
+  else box.innerHTML=renderProfilePromotionAccounts(entries,[]);
+  // The YouTube status endpoint is optional and must never hold up manual profile accounts.
+  if(!entries.some(([p])=>p==="YouTube")){
+   timeout(authClient.functions.invoke("youtube-connection-status"),4500,"YouTube check").then(({data, error})=>{
+    if(!error&&data?.connected&&data.channel?.channel_id){
+     const current=entries.filter(([p])=>p!=="YouTube");current.push(["YouTube","https://www.youtube.com/channel/"+data.channel.channel_id]);
+     if(document.getElementById("profilePromotionList"))box.innerHTML=renderProfilePromotionAccounts(current,window.__cbMineCampaigns||[]);
+    }else if(!entries.length&&document.getElementById("profilePromotionList"))box.innerHTML='No social accounts added yet. Add public profile links in <a href="?page=profile" onclick="event.preventDefault();showPage(\'profile\')">Profile</a> or authorize YouTube there.';
+   }).catch(()=>{if(!entries.length&&document.getElementById("profilePromotionList"))box.innerHTML='No social accounts found. Add public profile links in <a href="?page=profile" onclick="event.preventDefault();showPage(\'profile\')">Profile</a>.';});
+  }
+  if(!entries.length){if(!box.innerHTML.includes("Checking for authorized"))box.innerHTML='No social accounts added yet. Add public profile links in <a href="?page=profile" onclick="event.preventDefault();showPage(\'profile\')">Profile</a> or authorize YouTube there.';}
+  // Campaign status is loaded with a short timeout; accounts stay visible if this RPC is slow.
+  try{const {data,error}=await timeout(authClient.rpc("my_creatorboost_campaigns_v2"),6000,"Campaign status");if(error)throw error;window.__cbMineCampaigns=(data||[]).filter(x=>x.is_mine);if(entries.length)box.innerHTML=renderProfilePromotionAccounts(entries,window.__cbMineCampaigns);}
+  catch(e){if(entries.length){const note=document.createElement("p");note.className="small";note.textContent="Your accounts are shown. Campaign status is taking longer than expected; refresh to retry.";box.appendChild(note);}else if(!box.innerHTML.includes("Checking for authorized"))box.textContent="No connected accounts found. You can add them in Profile.";}
+ }catch(e){box.innerHTML='Could not check your account yet. <button class="btn alt" type="button" onclick="loadProfilePromotions()">Try again</button>';console.warn("Promote account loading:",e);}
+}
+function renderProfilePromotionAccounts(entries,mine){
+ return entries.map(([platform,url])=>{
   const goal=profilePromoGoals[platform]||promotionGoals[0],title=platform+" · "+goal;
-  const item=mine.find(x=>x.title===title&&x.url===url&&x.status!=="cancelled"),on=!!item&&item.status==="active",budget=item?Number(item.bid||10):50,key=platform+"|"+goal;
+  const item=(mine||[]).find(x=>x.title===title&&x.url===url&&x.status!=="cancelled"),on=!!item&&item.status==="active",budget=item?Number(item.bid||10):50,key=platform+"|"+goal;
   return '<article class="task cb-promo-account"><div class="cb-promo-account-head"><div><div class="eyebrow">CONNECTED ACCOUNT</div><b>'+campaignText(platform)+'</b><div class="small cb-promo-url">'+campaignText(url)+'</div></div><span class="cb-promo-state '+(on?'is-on':'')+'">'+(on?'ACTIVE':item?'PAUSED':'OFF')+'</span></div><div class="cb-promo-controls"><label class="small">What do you want to promote?<select class="search" data-promo-goal="'+campaignText(platform)+'">'+promotionGoals.map(g=>'<option '+(g===goal?'selected':'')+'>'+campaignText(g)+'</option>').join("")+'</select></label><label class="small">Total budget · points<input class="search" type="number" min="10" step="1" value="'+budget+'" data-promo-bid="'+campaignText(key)+'"></label><button class="btn '+(on?'alt':'')+'" type="button" data-promo-toggle="'+campaignText(platform)+'" data-promo-url="'+campaignText(url)+'" data-promo-goal-value="'+campaignText(goal)+'" data-promo-id="'+(item?campaignText(item.id):'')+'" data-promo-enabled="'+(on?'true':'false')+'">'+(on?'Turn OFF':'Turn ON')+'</button></div><p class="small cb-promo-foot">Budget is reserved from your unified wallet. Creators earn the listed reward only for approved campaign work. No guaranteed engagement.</p></article>';
  }).join("");
 }
