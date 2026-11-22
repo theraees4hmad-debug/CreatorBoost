@@ -862,10 +862,12 @@ async function loadTaskSubmissions(){
 }
 async function loadEarnCampaigns(){
  const box=document.getElementById("earnCampaignList");if(!box)return;
- if(!authClient){box.innerHTML='<p class="small">Sign in to browse paid creator campaigns.</p>';return;}
+ if(!authClient){box.innerHTML='<p class="small">Sign in to see active creator campaigns and submit work.</p><button class="btn" type="button" onclick="showPage(\'account\')">Sign in</button>';return;}
+ const {data:sessionData}=await authClient.auth.getSession();
+ if(!sessionData?.session){box.innerHTML='<p class="small">Sign in to see active creator campaigns and submit work.</p><button class="btn" type="button" onclick="showPage(\'account\')">Sign in</button>';return;}
  box.innerHTML='<p class="small">Loading active campaigns…</p>';
  const {data,error}=await authClient.rpc("my_creatorboost_campaigns_v2");
- if(error){box.innerHTML='<p class="small">Campaigns are temporarily unavailable. Please refresh.</p>';return;}
+ if(error){box.innerHTML='<p class="small">Could not load campaign demand right now.</p><button class="btn alt" type="button" onclick="loadEarnCampaigns()">Try again</button>';return;}
  const eligible=(data||[]).filter(x=>!x.is_mine&&x.status==="active"&&Number(x.remaining_budget||0)>=Number(x.reward_per_creator||0)&&(earnFilter==="All"||x.platform===earnFilter)).sort((a,b)=>Number(b.reward_per_creator||0)-Number(a.reward_per_creator||0)||Number(b.remaining_budget||0)-Number(a.remaining_budget||0)||new Date(a.created_at||0)-new Date(b.created_at||0)),seen=new Set(),rows=eligible.filter(x=>{const k=String(x.platform||"").toLowerCase()+"|"+String(x.url||"").replace(/\/$/,"").toLowerCase();if(seen.has(k))return false;seen.add(k);return true;});
  box.innerHTML=rows.length?rows.map((x,i)=>{
   const reward=Number(x.reward_per_creator||0),goal=String(x.title||"").split(" · ").slice(1).join(" · ")||"Creator promotion";
@@ -959,7 +961,7 @@ async function submitCampaignWork(id){
  if(evidence.trim().length<3){say("Please add at least 3 characters of evidence.");return;}
  const {error}=await authClient.rpc("submit_creatorboost_campaign",{p_campaign_id:id,p_evidence:evidence.trim()});
  if(error){say("Campaign submission failed: "+error.message);return;}
- say("Campaign work submitted for review. Points are paid only after approval.");await loadCampaignReviewQueue();showCampaigns();
+ say("Campaign work submitted for review. Points are paid only after approval.");await loadEarnCampaigns();
 }
 async function submitTaskForVerification(id){
  const t=tasks.find(x=>x.id===id);if(!t)return;
