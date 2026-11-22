@@ -70,7 +70,7 @@ create or replace function public.admin_review_creatorboost_payment(
  p_request_id uuid,p_action text
 ) returns text
 language plpgsql security definer set search_path=public,auth as $$
-declare v_p public.cb_payment_requests%rowtype;
+declare v_p public.cb_payment_requests%rowtype; v_credit bigint;
 begin
  if auth.uid() is null or not exists(select 1 from public.cb_task_reviewers r where r.user_id=auth.uid()) then
   raise exception 'Admin permission required';
@@ -79,10 +79,24 @@ begin
  select * into v_p from public.cb_payment_requests where id=p_request_id for update;
  if not found then raise exception 'Payment request not found'; end if;
  if v_p.status<>'pending' then raise exception 'This payment request has already been reviewed'; end if;
+
+ -- Only a verified wallet deposit credits points. Buyer orders are payment
+ -- confirmations for a campaign request and must never credit the wallet.
+ if p_action='approve' and v_p.request_type='deposit' then
+  v_credit:=round(v_p.amount*100)::bigint;
+  if v_credit<1 then raise exception 'Deposit is too small to convert to points'; end if;
+  insert into public.cb_points_accounts(user_id,balance)
+   values(v_p.user_id,v_credit)
+   on conflict(user_id) do update
+    set balance=public.cb_points_accounts.balance+excluded.balance,updated_at=now();
+  insert into public.cb_points_ledger(user_id,submission_id,points,reason,entry_type,delta)
+   values(v_p.user_id,null,v_credit,'Verified wallet deposit','deposit_credit',v_credit);
+ end if;
+
  update public.cb_payment_requests set status=case when p_action='approve' then 'approved' else 'rejected' end,
  reviewed_at=now(),reviewer_id=auth.uid() where id=p_request_id;
  return case when p_action='approve' then 'approved' else 'rejected' end;
-end $$;
+end $;
 
 revoke all on function public.create_creatorboost_payment_request(text,numeric,text,text,jsonb) from public,anon;
 revoke all on function public.my_creatorboost_payment_requests() from public,anon;
