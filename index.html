@@ -699,7 +699,13 @@ async function loadProfilePromotions(){
  const {data:{user},error:userError}=await authClient.auth.getUser();
  if(userError||!user){box.textContent="Sign in to manage promotions.";return;}
  const links=user.user_metadata?.creatorboost_profile?.links||{},entries=Object.entries(links).filter(([,url])=>url);
- if(!entries.length){box.innerHTML='No social accounts added yet. Add accounts in <a href="?page=profile" onclick="event.preventDefault();showPage(\'profile\')">Profile</a> and they will appear here.';return;}
+ // YouTube OAuth connections are stored securely in their own table, not in user metadata.
+ // Include the authorized channel in Promote so it appears alongside manually saved profile links.
+ if(!entries.some(([p])=>p==="YouTube")){
+  try{const {data:yt,error:ytError}=await authClient.functions.invoke("youtube-connection-status");if(!ytError&&yt?.connected&&yt.channel?.channel_id){entries.push(["YouTube","https://www.youtube.com/channel/"+yt.channel.channel_id]);}}
+  catch(e){console.warn("Could not load YouTube promotion account",e);}
+ }
+ if(!entries.length){box.innerHTML='No social accounts added yet. Add public profile links in <a href="?page=profile" onclick="event.preventDefault();showPage(\'profile\')">Profile</a> or authorize YouTube there.';return;}
  const {data:campaigns,error}=await authClient.rpc("my_creatorboost_campaigns_v2");
  if(error){box.textContent="Could not load promotion status. Please try again.";return;}
  const mine=(campaigns||[]).filter(x=>x.is_mine);
