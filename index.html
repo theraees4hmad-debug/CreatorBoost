@@ -300,6 +300,41 @@ button{max-width:100%;white-space:normal}
 
 /* Virtual sports and casino demo */
 .cb-games-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.cb-game-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}.cb-game-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.cb-game-balance{font-size:22px;font-weight:850;color:var(--cyan)}.cb-event{border:1px solid var(--line);border-radius:13px;padding:14px;margin-top:12px}.cb-event-title{font-weight:800;margin-bottom:4px}.cb-market{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.cb-odd{background:#202943;color:#f5f6ff;border:1px solid #3b496c;border-radius:10px;padding:10px 7px;cursor:pointer;text-align:center}.cb-odd b{display:block;color:var(--cyan);font-size:15px}.cb-odd[aria-pressed=true]{border-color:var(--cyan);background:#173b42}.cb-game-input{width:100%;max-width:180px;background:#10172a;color:#fff;border:1px solid var(--line);padding:11px;border-radius:10px}.cb-bet-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:13px}.cb-game-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.cb-game-tabs button{border:1px solid var(--line);background:#202943;color:#fff;padding:9px 13px;border-radius:10px;cursor:pointer}.cb-game-tabs button.active{background:linear-gradient(100deg,var(--purple),#638bff);border-color:transparent}.cb-casino-play{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.cb-casino-play button{min-height:92px;border:1px solid var(--line);background:#202943;color:#fff;border-radius:13px;padding:12px;cursor:pointer;font-weight:750}.cb-casino-play button span{display:block;font-size:24px;margin-bottom:5px}.cb-demo-note{font-size:12px;color:var(--muted);line-height:1.5}.cb-game-message{padding:12px;border-radius:10px;background:#111a2b;border:1px solid var(--line);margin-top:12px;min-height:44px}@media(max-width:760px){.cb-games-grid{grid-template-columns:1fr}.cb-market{gap:5px}.cb-odd{font-size:12px;padding:9px 3px}.cb-casino-play{grid-template-columns:1fr}}
+/* Kick-inspired dark creator-streaming theme */
+:root{--bg:#080b09;--card:#121713;--line:#28352c;--muted:#a5b2a8;--purple:#53fc18;--cyan:#8dff65}
+body{background:radial-gradient(ellipse at 78% -8%,#1b4923 0,transparent 34%),#080b09;color:#f4fff5}
+.top{background:rgba(8,11,9,.96);border-bottom:1px solid #26342a}
+.mark{background:#53fc18;color:#071008;border-radius:8px;box-shadow:0 0 22px #53fc1838}
+.nav a{color:#b6c4b8}
+.nav a:hover,.nav a:focus-visible,.nav a[aria-current="page"]{background:#1b2b1d;color:#7dff55}
+.wallet{background:#111a13;border-color:#354a38;color:#baffaa}
+.eyebrow{color:#70ff43}.gradient{background:linear-gradient(90deg,#a5ff82,#53fc18);color:transparent;background-clip:text}
+.lead{color:#b4c1b7}.btn{background:#53fc18;color:#071008;border-radius:8px;box-shadow:0 5px 18px #53fc1820}
+.btn:hover{filter:brightness(1.08);box-shadow:0 7px 22px #53fc1838}.btn.alt{background:#1a241c;border:1px solid #3b5140;color:#e9f6eb}
+.panel,.stat,.creator,.task{background:#121713;border-color:#2b392f;border-radius:12px;box-shadow:0 10px 28px #0005}
+.panel{background:linear-gradient(145deg,#1b281e,#111713);border-color:#344b38}
+.score{color:#83ff59}.bars i{background:linear-gradient(180deg,#9cff72,#36c90d)}
+.search{background:#101612;border-color:#344338;color:#f4fff5}.chip{background:#111813;border-color:#344338;color:#bdcabe;border-radius:8px}
+.chip.active{background:#1c351e;border-color:#53fc18;color:white}.face{background:linear-gradient(135deg,#294a2b,#315c37);border-radius:10px}
+.tag{background:#1d2d20;color:#b6ff9e;border-radius:5px}.reward{color:#83ff59}
+.foot,.bottom{border-color:#29372d}.notice{background:#18331b;color:#c9ffc0}
+.mobile-nav{background:rgba(15,22,17,.98);border-color:#3a4e3d}
+.mobile-nav a[aria-current="page"],.mobile-nav a:hover,.mobile-nav button:hover{background:#1b351e;color:#9dff7c}
+.nav-more-menu{background:#121913;border-color:#3b5140}.nav-more-menu a{color:#e6f2e8}
+.nav-more-menu a:hover,.nav-more-menu a[aria-current="page"]{background:#1b351e;color:#9dff7c}
+#pageIntro{background:linear-gradient(120deg,#1b2c1e,#121713);border-color:#344b38}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline-color:#7dff55}
+.auth-panel{background:#121713}.auth-panel .search{background:#0c110e}.text-link{color:#8dff65}
+.payment-choice{background:linear-gradient(145deg,#1a261d,#111713);border-color:#3b4c3d}
+.payment-choice.selected{border-color:#53fc18;background:linear-gradient(145deg,#233b25,#142017);box-shadow:0 0 0 2px #53fc1840,0 12px 28px #0005}
+.pay-check{color:#83ff59}.wallet-payment-footer{background:linear-gradient(145deg,#1a261d,#111713);border-color:#344b38}
+.wallet-payment-heading span{color:#8dff65}
+.earn-task-column,.earn-bid-column{background:linear-gradient(145deg,#172019,#101612);border-color:#2d3d31}
+.earn-app{background:#111813;border-color:#2e3e32}.earn-app.active{border-color:#53fc18;background:#1b351e;box-shadow:0 0 0 1px #53fc1844}
+.app-all{background:linear-gradient(135deg,#53fc18,#a5ff82);color:#071008}
+.bid-symbol{background:linear-gradient(135deg,#53fc18,#a5ff82);color:#071008}
+@media(max-width:760px){.mobile-nav{box-shadow:0 12px 35px #000b}.top{background:rgba(8,11,9,.98)}}
+
 </style></head><body>
 <header class="top wrap"><div class="brand"><span class="mark">C</span>CreatorBoost</div><nav class="nav" aria-label="Main navigation"><a href="?page=home" data-page="home">⌂ <span>Home</span></a><a href="?page=dashboard" data-page="dashboard">▦ <span>Dashboard</span></a><a href="?page=earn" data-page="earn">✦ <span>Earn</span></a><a href="?page=promote" data-page="promote">↗ <span>Promote</span></a><a href="?page=wallet" data-page="wallet">▣ <span>Wallet</span></a><a href="?page=profile" data-page="profile">◎ <span>Profile</span></a><a href="?page=account" data-page="account">↪ <span>Account</span></a></nav><div class="wallet">✦ <b id="topPoints">120</b> pts</div></header>
 <main class="wrap"><div id="pageIntro"><strong>CreatorBoost</strong><span>Your creator workspace</span></div>
