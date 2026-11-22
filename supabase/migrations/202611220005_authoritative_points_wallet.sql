@@ -18,7 +18,7 @@ set delta=case
 where delta=0;
 
 create or replace function public.set_creatorboost_ledger_delta()
-returns trigger language plpgsql set search_path=public as $
+returns trigger language plpgsql set search_path=public as $$
 begin
   if new.delta=0 then
     new.delta:=case
@@ -27,18 +27,18 @@ begin
       else new.delta end;
   end if;
   return new;
-end $;
+end $$;
 drop trigger if exists cb_points_ledger_delta on public.cb_points_ledger;
 create trigger cb_points_ledger_delta before insert on public.cb_points_ledger
 for each row execute function public.set_creatorboost_ledger_delta();
 
 create or replace function public.my_creatorboost_points_ledger()
 returns table(id uuid,points integer,delta bigint,reason text,entry_type text,created_at timestamptz)
-language sql stable security definer set search_path=public,auth as $
+language sql stable security definer set search_path=public,auth as $$
   select l.id,l.points,l.delta,l.reason,l.entry_type,l.created_at
   from public.cb_points_ledger l where l.user_id=auth.uid()
   order by l.created_at desc limit 100
-$;
+$$;
 
 create table if not exists public.cb_campaigns (
   id uuid primary key default gen_random_uuid(),
@@ -89,10 +89,10 @@ begin
 end $$;
 
 create or replace function public.my_creatorboost_daily_claim_status()
-returns boolean language sql stable security definer set search_path=public,auth as $
+returns boolean language sql stable security definer set search_path=public,auth as $$
   select exists(select 1 from public.cb_daily_points_claims
     where user_id=auth.uid() and claim_date=timezone('utc',now())::date)
-$;
+$$;
 
 create or replace function public.claim_creatorboost_daily_points()
 returns integer
@@ -113,12 +113,12 @@ end $$;
 
 create or replace function public.my_creatorboost_campaigns()
 returns table(id uuid,title text,url text,platform text,bid integer,status text,created_at timestamptz,is_mine boolean)
-language sql stable security definer set search_path=public,auth as $
+language sql stable security definer set search_path=public,auth as $$
   select c.id,c.title,c.url,c.platform,c.bid,c.status,c.created_at,(c.user_id=auth.uid())
   from public.cb_campaigns c
   where c.status='active' or (c.user_id=auth.uid() and c.status='paused')
   order by (c.user_id=auth.uid()) desc,c.created_at desc
-$;
+$$;
 
 create or replace function public.create_creatorboost_campaign(
   p_title text,p_url text,p_platform text,p_bid integer
