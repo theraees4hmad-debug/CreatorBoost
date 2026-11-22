@@ -501,7 +501,7 @@ function startCreatorTask(id){
  const packages={YouTube:"com.google.android.youtube",Instagram:"com.instagram.android",TikTok:"com.zhiliaoapp.musically",Facebook:"com.facebook.katana",X:"com.twitter.android",Snapchat:"com.snapchat.android",Twitch:"tv.twitch.android.app",Kick:"com.kick.mobile",Threads:"com.instagram.barcelona",Pinterest:"com.pinterest",LinkedIn:"com.linkedin.android",Reddit:"com.reddit.frontpage"};
  const fallback=t.url;
  if(/Android/i.test(navigator.userAgent)&&packages[t.p]){
-  const intent="intent://"+fallback.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;package="+packages[t.p]+";S.browser_fallback_url="+encodeURIComponent(fallback)+";end";
+  const intent="intent://"+fallback.replace("https://","").replace("http://","")+"#Intent;scheme=https;package="+packages[t.p]+";S.browser_fallback_url="+encodeURIComponent(fallback)+";end";
   window.location.href=intent;
  }else{
   window.open(fallback,"_blank","noopener,noreferrer");
