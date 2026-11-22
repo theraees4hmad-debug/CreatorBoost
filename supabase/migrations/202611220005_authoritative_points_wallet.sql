@@ -55,6 +55,12 @@ begin
   return query select a.balance from public.cb_points_accounts a where a.user_id=auth.uid();
 end $$;
 
+create or replace function public.my_creatorboost_daily_claim_status()
+returns boolean language sql stable security definer set search_path=public,auth as $
+  select exists(select 1 from public.cb_daily_points_claims
+    where user_id=auth.uid() and claim_date=timezone('utc',now())::date)
+$;
+
 create or replace function public.claim_creatorboost_daily_points()
 returns integer
 language plpgsql security definer set search_path=public,auth as $$
@@ -73,12 +79,13 @@ exception when unique_violation then
 end $$;
 
 create or replace function public.my_creatorboost_campaigns()
-returns table(id uuid,title text,url text,platform text,bid integer,status text,created_at timestamptz)
-language sql stable security definer set search_path=public,auth as $$
-  select c.id,c.title,c.url,c.platform,c.bid,c.status,c.created_at
-  from public.cb_campaigns c where c.user_id=auth.uid() and c.status <> 'cancelled'
-  order by c.created_at desc
-$$;
+returns table(id uuid,title text,url text,platform text,bid integer,status text,created_at timestamptz,is_mine boolean)
+language sql stable security definer set search_path=public,auth as $
+  select c.id,c.title,c.url,c.platform,c.bid,c.status,c.created_at,(c.user_id=auth.uid())
+  from public.cb_campaigns c
+  where c.status='active' or (c.user_id=auth.uid() and c.status='paused')
+  order by (c.user_id=auth.uid()) desc,c.created_at desc
+$;
 
 create or replace function public.create_creatorboost_campaign(
   p_title text,p_url text,p_platform text,p_bid integer
@@ -193,6 +200,7 @@ $$;
 
 revoke all on function public.my_creatorboost_wallet() from public,anon;
 revoke all on function public.claim_creatorboost_daily_points() from public,anon;
+revoke all on function public.my_creatorboost_daily_claim_status() from public,anon;
 revoke all on function public.my_creatorboost_campaigns() from public,anon;
 revoke all on function public.create_creatorboost_campaign(text,text,text,integer) from public,anon;
 revoke all on function public.update_creatorboost_campaign(uuid,text,text,text,integer) from public,anon;
@@ -200,6 +208,7 @@ revoke all on function public.set_creatorboost_campaign_status(uuid,text) from p
 revoke all on function public.my_creatorboost_daily_progress() from public,anon;
 grant execute on function public.my_creatorboost_wallet() to authenticated;
 grant execute on function public.claim_creatorboost_daily_points() to authenticated;
+grant execute on function public.my_creatorboost_daily_claim_status() to authenticated;
 grant execute on function public.my_creatorboost_campaigns() to authenticated;
 grant execute on function public.create_creatorboost_campaign(text,text,text,integer) to authenticated;
 grant execute on function public.update_creatorboost_campaign(uuid,text,text,text,integer) to authenticated;
