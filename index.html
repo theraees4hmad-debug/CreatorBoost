@@ -215,7 +215,7 @@ async function loadTaskSubmissions(){
  if(!authClient)return;
  const {data:{session}}=await authClient.auth.getSession();
  const panel=document.getElementById("taskReviewPanel");
- if(panel&&session?.user?.app_metadata?.role==="admin"){panel.style.display="block";loadTaskReviewQueue();}
+ if(panel&&session){const {error:reviewAccessError}=await authClient.rpc("admin_creatorboost_pending_submissions");if(!reviewAccessError){panel.style.display="block";loadTaskReviewQueue();}else{panel.style.display="none";}}
  const {data,error}=await authClient.rpc("my_creatorboost_task_submissions");
  if(error){console.warn("Task status unavailable:",error.message);return;}
  verifiedTaskState={};(data||[]).forEach(x=>verifiedTaskState[x.task_id]=x.status);
