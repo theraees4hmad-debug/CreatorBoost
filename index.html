@@ -713,7 +713,8 @@ function showPage(page,addHistory=true){
   discover:["#discover"],
   profile:["#join"],
   account:["#account"],
-  admin:["#adminReviewPage"],\n  games:["#games"]
+  admin:["#adminReviewPage"],
+  games:["#games"]
  };
  document.querySelectorAll("main.wrap>section").forEach(el=>el.hidden=true);
  groups[page].forEach(sel=>document.querySelectorAll(sel).forEach(el=>el.hidden=false));
