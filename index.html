@@ -955,7 +955,8 @@ function showPage(page,addHistory=true){
  const intro=document.getElementById("pageIntro");if(intro)intro.innerHTML="<strong>"+labels[page][0]+"</strong><span>"+labels[page][1]+"</span>";
  document.querySelectorAll("[data-page]").forEach(a=>{if(a.dataset.page===page)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
  if(addHistory)history.pushState({page},"","?page="+page);
- if(page==="chat")initCreatorChat();\n window.scrollTo({top:0,behavior:"instant"});
+ if(page==="chat")initCreatorChat();
+ window.scrollTo({top:0,behavior:"instant"});
 }
 window.addEventListener("popstate",()=>showPage(new URLSearchParams(location.search).get("page")||"home",false));
 document.querySelectorAll("[data-page]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();showPage(a.dataset.page);const menu=document.getElementById("navMoreMenu"),toggle=document.querySelector(".nav-more-toggle");if(menu)menu.hidden=true;if(toggle)toggle.setAttribute("aria-expanded","false");}));
