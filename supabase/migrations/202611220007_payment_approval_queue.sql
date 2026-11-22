@@ -96,7 +96,7 @@ begin
  update public.cb_payment_requests set status=case when p_action='approve' then 'approved' else 'rejected' end,
  reviewed_at=now(),reviewer_id=auth.uid() where id=p_request_id;
  return case when p_action='approve' then 'approved' else 'rejected' end;
-end $;
+end $$;
 
 revoke all on function public.create_creatorboost_payment_request(text,numeric,text,text,jsonb) from public,anon;
 revoke all on function public.my_creatorboost_payment_requests() from public,anon;
