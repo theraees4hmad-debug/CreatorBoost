@@ -1,3 +1,2 @@
 # CreatorBoost
-Creator discovery and promotion platform
-public 
+Creator discovery and promotion platform 
