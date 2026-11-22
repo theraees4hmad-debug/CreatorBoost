@@ -169,6 +169,18 @@ button{max-width:100%;white-space:normal}
  .social-connected-list>.task .btn{width:100%}
 }
 
+
+/* Prevent the social profile URL field and action button escaping the panel */
+.social-connect-panel,.social-connect-panel *{box-sizing:border-box}
+.social-connect-panel{width:100%;max-width:100%;grid-template-columns:minmax(0,.8fr) minmax(0,1.5fr) minmax(0,auto);overflow:hidden}
+.social-connect-panel label{width:100%;max-width:100%}
+.social-connect-panel input,.social-connect-panel select{display:block;width:100%;max-width:100%;min-width:0}
+.social-connect-panel .social-connect-btn{width:auto;max-width:100%;min-width:0;padding-left:clamp(10px,2vw,19px);padding-right:clamp(10px,2vw,19px)}
+@media(max-width:760px){
+ .social-connect-panel{grid-template-columns:minmax(0,1fr)}
+ .social-connect-panel .social-connect-btn{width:100%}
+}
+
 </style></head><body>
 <header class="top wrap"><div class="brand"><span class="mark">C</span>CreatorBoost</div><nav class="nav" aria-label="Main navigation"><a href="?page=home" data-page="home">Home</a><a href="?page=dashboard" data-page="dashboard">Dashboard</a><a href="?page=earn" data-page="earn">Earn points</a><a href="?page=promote" data-page="promote">Promote</a><a href="?page=buyers" data-page="buyers">Buyers</a><a href="?page=wallet" data-page="wallet">Wallet</a><a href="?page=discover" data-page="discover">Discover</a><a href="?page=profile" data-page="profile">Profile</a></nav><div class="wallet">✦ <b id="topPoints">120</b> pts</div></header>
 <main class="wrap"><div id="pageIntro"><strong>CreatorBoost</strong><span>Your creator workspace</span></div>
