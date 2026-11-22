@@ -7,6 +7,39 @@ alter table public.cb_points_ledger
 alter table public.cb_points_ledger
   add column if not exists entry_type text not null default 'task_reward';
 
+alter table public.cb_points_ledger
+  add column if not exists delta bigint not null default 0;
+
+update public.cb_points_ledger
+set delta=case
+  when entry_type in ('campaign_bid') then -points
+  when entry_type in ('campaign_refund','task_reward','daily_bonus','daily_task_milestone') then points
+  else delta end
+where delta=0;
+
+create or replace function public.set_creatorboost_ledger_delta()
+returns trigger language plpgsql set search_path=public as $
+begin
+  if new.delta=0 then
+    new.delta:=case
+      when new.entry_type='campaign_bid' then -new.points
+      when new.entry_type in ('campaign_refund','task_reward','daily_bonus','daily_task_milestone') then new.points
+      else new.delta end;
+  end if;
+  return new;
+end $;
+drop trigger if exists cb_points_ledger_delta on public.cb_points_ledger;
+create trigger cb_points_ledger_delta before insert on public.cb_points_ledger
+for each row execute function public.set_creatorboost_ledger_delta();
+
+create or replace function public.my_creatorboost_points_ledger()
+returns table(id uuid,points integer,delta bigint,reason text,entry_type text,created_at timestamptz)
+language sql stable security definer set search_path=public,auth as $
+  select l.id,l.points,l.delta,l.reason,l.entry_type,l.created_at
+  from public.cb_points_ledger l where l.user_id=auth.uid()
+  order by l.created_at desc limit 100
+$;
+
 create table if not exists public.cb_campaigns (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -131,8 +164,8 @@ begin
   update public.cb_campaigns set title=trim(p_title),url=trim(p_url),platform=p_platform,bid=p_bid,updated_at=now()
     where id=p_campaign_id;
   if v_diff <> 0 then
-    insert into public.cb_points_ledger(user_id,submission_id,points,reason,entry_type)
-      values(v_uid,null,abs(v_diff),'Campaign bid adjustment: '||trim(p_title),'campaign_adjustment');
+    insert into public.cb_points_ledger(user_id,submission_id,points,reason,entry_type,delta)
+      values(v_uid,null,abs(v_diff),'Campaign bid adjustment: '||trim(p_title),'campaign_adjustment',-v_diff);
   end if;
   return v_diff;
 end $$;
@@ -199,6 +232,7 @@ language sql stable security definer set search_path=public,auth as $$
 $$;
 
 revoke all on function public.my_creatorboost_wallet() from public,anon;
+revoke all on function public.my_creatorboost_points_ledger() from public,anon;
 revoke all on function public.claim_creatorboost_daily_points() from public,anon;
 revoke all on function public.my_creatorboost_daily_claim_status() from public,anon;
 revoke all on function public.my_creatorboost_campaigns() from public,anon;
@@ -207,6 +241,7 @@ revoke all on function public.update_creatorboost_campaign(uuid,text,text,text,i
 revoke all on function public.set_creatorboost_campaign_status(uuid,text) from public,anon;
 revoke all on function public.my_creatorboost_daily_progress() from public,anon;
 grant execute on function public.my_creatorboost_wallet() to authenticated;
+grant execute on function public.my_creatorboost_points_ledger() to authenticated;
 grant execute on function public.claim_creatorboost_daily_points() to authenticated;
 grant execute on function public.my_creatorboost_daily_claim_status() to authenticated;
 grant execute on function public.my_creatorboost_campaigns() to authenticated;
