@@ -496,7 +496,17 @@ function showTasks(){
   return '<article class="task"><div class="reward">Up to '+t.v+' points</div><h3>'+t.n+'</h3><p>'+t.d+'</p>'+start+'<div class="small">Status: '+status.replace(/_/g," ")+'</div><button class="btn" '+(disabled?'disabled':'')+' onclick="submitTaskForVerification(\''+t.id+'\')">'+label+'</button></article>';
  }).join("");
 }
-function startCreatorTask(id){const t=tasks.find(x=>x.id===id);if(!t||!t.url)return;window.open(t.url,"_blank","noopener,noreferrer");}
+function startCreatorTask(id){
+ const t=tasks.find(x=>x.id===id);if(!t||!t.url)return;
+ const packages={YouTube:"com.google.android.youtube",Instagram:"com.instagram.android",TikTok:"com.zhiliaoapp.musically",Facebook:"com.facebook.katana",X:"com.twitter.android",Snapchat:"com.snapchat.android",Twitch:"tv.twitch.android.app",Kick:"com.kick.mobile",Threads:"com.instagram.barcelona",Pinterest:"com.pinterest",LinkedIn:"com.linkedin.android",Reddit:"com.reddit.frontpage"};
+ const fallback=t.url;
+ if(/Android/i.test(navigator.userAgent)&&packages[t.p]){
+  const intent="intent://"+fallback.replace(/^https?:\\/\\//,"")+"#Intent;scheme=https;package="+packages[t.p]+";S.browser_fallback_url="+encodeURIComponent(fallback)+";end";
+  window.location.href=intent;
+ }else{
+  window.open(fallback,"_blank","noopener,noreferrer");
+ }
+}
 async function loadTaskReviewQueue(){
  const box=document.getElementById("taskReviewList");if(!box)return;
  const {data,error}=await authClient.rpc("admin_creatorboost_pending_submissions");
