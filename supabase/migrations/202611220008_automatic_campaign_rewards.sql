@@ -15,6 +15,7 @@ create table if not exists public.cb_campaign_submissions (
   user_id uuid not null references auth.users(id) on delete cascade,
   evidence text not null check (length(trim(evidence)) between 3 and 2000),
   status text not null default 'pending' check (status in ('pending','approved','rejected')),
+  reward_points integer not null check (reward_points > 0),
   paid_points integer not null default 0 check (paid_points >= 0),
   submitted_at timestamptz not null default now(),
   reviewed_at timestamptz,
@@ -73,7 +74,7 @@ begin
  if p_platform not in ('Instagram','YouTube','TikTok','Facebook','X','Snapchat','Twitch','Kick','Threads','Pinterest','LinkedIn','Reddit') then raise exception 'Unsupported platform'; end if;
  if p_budget is null or p_budget<10 or p_reward_per_creator is null or p_reward_per_creator<1 or p_reward_per_creator>p_budget then raise exception 'Invalid budget or creator reward'; end if;
  v_diff:=p_budget-v_c.bid;
- if v_c.remaining_budget+v_diff<0 then raise exception 'New budget cannot be lower than points already paid to creators'; end if;
+ if v_c.remaining_budget+v_diff < coalesce((select sum(s.reward_points) from public.cb_campaign_submissions s where s.campaign_id=p_campaign_id and s.status='pending'),0) then raise exception 'New budget cannot be lower than pending creator rewards'; end if;
  if v_diff>0 then
   update public.cb_points_accounts set balance=balance-v_diff,updated_at=now() where user_id=v_uid and balance>=v_diff;
   if not found then raise exception 'Not enough points for the increased budget'; end if;
@@ -120,8 +121,8 @@ begin
  if not found then raise exception 'Campaign is not currently accepting submissions'; end if;
  if v_campaign.user_id=v_uid then raise exception 'You cannot submit to your own campaign'; end if;
  if v_campaign.remaining_budget<v_campaign.reward_per_creator then raise exception 'This campaign has no remaining reward budget'; end if;
- insert into public.cb_campaign_submissions(campaign_id,user_id,evidence)
- values(p_campaign_id,v_uid,trim(p_evidence)) returning id into v_id;
+ insert into public.cb_campaign_submissions(campaign_id,user_id,evidence,reward_points)
+ values(p_campaign_id,v_uid,trim(p_evidence),v_campaign.reward_per_creator) returning id into v_id;
  return v_id;
 exception when unique_violation then raise exception 'You have already submitted to this campaign';
 end $$;
@@ -132,7 +133,7 @@ language plpgsql stable security definer set search_path=public,auth as $$
 begin
  if auth.uid() is null or not exists(select 1 from public.cb_task_reviewers r where r.user_id=auth.uid()) then raise exception 'Admin permission required'; end if;
  return query
- select s.id,s.campaign_id,c.title,s.user_id,s.evidence,s.submitted_at,c.reward_per_creator,c.remaining_budget
+ select s.id,s.campaign_id,c.title,s.user_id,s.evidence,s.submitted_at,s.reward_points,c.remaining_budget
  from public.cb_campaign_submissions s join public.cb_campaigns c on c.id=s.campaign_id
  where s.status='pending' order by s.submitted_at asc;
 end $$;
@@ -151,7 +152,7 @@ begin
  end if;
  select * into v_c from public.cb_campaigns where id=v_s.campaign_id for update;
  if not found or v_c.status<>'active' then raise exception 'Campaign is not active; submission cannot be paid'; end if;
- v_reward:=v_c.reward_per_creator;
+ v_reward:=v_s.reward_points;
  if v_c.remaining_budget<v_reward then raise exception 'Insufficient campaign budget; no points were paid'; end if;
  update public.cb_campaigns set remaining_budget=remaining_budget-v_reward,updated_at=now() where id=v_c.id;
  insert into public.cb_points_accounts(user_id,balance) values(v_s.user_id,v_reward)
