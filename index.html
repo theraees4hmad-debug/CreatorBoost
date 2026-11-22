@@ -265,8 +265,6 @@ async function loadTaskSubmissions(){
    const mount=document.getElementById("adminReviewMount");
    if(mount&&panel.parentElement!==mount)mount.appendChild(panel);
    panel.style.display="block";
-   const intro=document.getElementById("pageIntro");
-   if(intro&&!document.getElementById("adminPageButton")){const b=document.createElement("button");b.id="adminPageButton";b.className="btn alt";b.type="button";b.textContent="Admin verification";b.onclick=()=>showPage("admin");intro.appendChild(b);}
    loadTaskReviewQueue();
   }else{panel.style.display="none";document.getElementById("adminPageButton")?.remove();}
  }
