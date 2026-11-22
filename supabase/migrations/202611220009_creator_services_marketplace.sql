@@ -79,9 +79,13 @@ create or replace function public.admin_update_creatorboost_service_order(
  p_order_id uuid,p_status text,p_provider_name text default '',p_provider_reference text default '',p_admin_notes text default ''
 ) returns text
 language plpgsql security definer set search_path=public,auth as $$
+declare v_order public.cb_service_orders%rowtype;
 begin
  if auth.uid() is null or not exists(select 1 from public.cb_task_reviewers r where r.user_id=auth.uid()) then raise exception 'Admin permission required'; end if;
  if p_status not in ('queued','in_progress','delivered','completed','cancelled','rejected') then raise exception 'Invalid order status'; end if;
+ select * into v_order from public.cb_service_orders where id=p_order_id for update;
+ if not found then raise exception 'Service order not found'; end if;
+ if v_order.status='pending_review' and v_order.payment_request_id is not null and not exists(select 1 from public.cb_payment_requests p where p.id=v_order.payment_request_id and p.status='approved') and p_status not in ('rejected','cancelled') then raise exception 'Verify the customer payment before starting this order'; end if;
  update public.cb_service_orders set status=p_status,provider_name=nullif(trim(p_provider_name),''),provider_reference=nullif(trim(p_provider_reference),''),admin_notes=coalesce(p_admin_notes,''),updated_at=now()
  where id=p_order_id;
  if not found then raise exception 'Service order not found'; end if;
