@@ -291,7 +291,7 @@ async function submitTaskForVerification(id){
  if(!evidence||!evidence.trim())return;
  const {data,error}=await authClient.rpc("submit_creatorboost_task",{p_task_id:id,p_evidence:evidence.trim()});
  if(error){say("Submission failed: "+error.message);return;}
- verifiedTaskState[id]="pending";showTasks();
+ verifiedTaskState[id]="pending";let snapshot=JSON.parse(localStorage.getItem("cb_task_status_snapshot")||"{}");snapshot[id]="pending";localStorage.setItem("cb_task_status_snapshot",JSON.stringify(snapshot));showTasks();
  say("Task submitted. Points are awarded only after genuine verification.");
 }
 document.getElementById("promotePlatforms").addEventListener("click",e=>{let b=e.target.closest("[data-promote-platform]");if(!b)return;promoteFilter=b.dataset.promotePlatform;document.querySelectorAll("#promotePlatforms .chip").forEach(x=>x.classList.toggle("active",x===b));showCampaigns()});document.getElementById("earnPlatforms").addEventListener("click",e=>{let b=e.target.closest("[data-earn-platform]");if(!b)return;earnFilter=b.dataset.earnPlatform;document.querySelectorAll("#earnPlatforms .earn-app").forEach(x=>x.classList.toggle("active",x===b));showTasks()});document.getElementById("search").addEventListener("input",showCreators);document.getElementById("filters").addEventListener("click",e=>{let b=e.target.closest("[data-filter]");if(!b)return;filter=b.dataset.filter;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x===b));showCreators()});wallet();renderDailyTaskBonus();showCreators();showTasks();showCampaigns();renderStats();renderBuyerOrders();updateChecklist();loadTaskSubmissions();
