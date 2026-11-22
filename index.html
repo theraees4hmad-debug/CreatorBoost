@@ -137,6 +137,38 @@ button{max-width:100%;white-space:normal}
  .mobile-nav{left:5px;right:5px;bottom:5px}
 }
 
+
+/* Social profile connection panel */
+#profileForm{max-width:850px;width:100%;padding:clamp(16px,3vw,26px);gap:15px!important}
+#profileForm>h3{font-size:clamp(20px,2.6vw,25px);margin:0;letter-spacing:-.4px}
+#profileForm>p{margin:0;line-height:1.65;max-width:680px}
+.social-connect-panel{display:grid;grid-template-columns:minmax(145px,.8fr) minmax(200px,1.5fr) auto;align-items:end;gap:12px;padding:clamp(13px,2.2vw,20px);border:1px solid #3b4569;border-radius:17px;background:linear-gradient(145deg,#202844,#151b30);min-width:0}
+.social-connect-panel label{display:grid;gap:7px;min-width:0;font-weight:700;color:#dce2fa}
+.social-connect-panel .search{width:100%;height:49px;min-width:0;border:1px solid #465477;border-radius:11px;background:#10162a;padding:10px 12px}
+.social-connect-panel .search:focus{border-color:#a99aff;box-shadow:0 0 0 3px #907bff25}
+.social-connect-btn{height:49px;min-width:160px;padding:0 19px;border-radius:12px;box-shadow:0 7px 18px #7060dc38;white-space:nowrap}
+.social-connect-btn span{font-size:19px;margin-right:4px}
+.social-connected-panel{padding:clamp(13px,2.2vw,19px);border:1px solid var(--line);border-radius:17px;background:#11172a;min-width:0}
+.social-connected-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.social-connected-heading b{font-size:16px}
+.social-count{font-size:11px;font-weight:800;color:#bcb0ff;background:#30295c;border:1px solid #554b91;border-radius:20px;padding:6px 11px}
+.social-connected-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px;margin-top:14px}
+.social-connected-list>.task{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;padding:13px;border:1px solid #354163;border-radius:14px;background:linear-gradient(145deg,#202844,#171d32);box-shadow:none}
+.social-connected-list>.task>div{min-width:0}
+.social-connected-list>.task .btn{min-height:38px;padding:8px 12px;border-radius:10px;font-size:12px;flex:0 0 auto;background:#382638;border:1px solid #70445e;color:#ffc6d6}
+.social-connected-list>.task .btn:hover{background:#513047;border-color:#a35c7d}
+.social-save-status{padding:10px 12px;border-radius:10px;background:#172b32;color:#a8eee0}
+@media(max-width:650px){
+ .social-connect-panel{grid-template-columns:minmax(0,1fr);gap:11px}
+ .social-connect-btn{width:100%;min-width:0;height:48px}
+ .social-connected-list{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:380px){
+ #profileForm{padding:13px}
+ .social-connected-list>.task{align-items:flex-start;flex-direction:column}
+ .social-connected-list>.task .btn{width:100%}
+}
+
 </style></head><body>
 <header class="top wrap"><div class="brand"><span class="mark">C</span>CreatorBoost</div><nav class="nav" aria-label="Main navigation"><a href="?page=home" data-page="home">Home</a><a href="?page=dashboard" data-page="dashboard">Dashboard</a><a href="?page=earn" data-page="earn">Earn points</a><a href="?page=promote" data-page="promote">Promote</a><a href="?page=buyers" data-page="buyers">Buyers</a><a href="?page=wallet" data-page="wallet">Wallet</a><a href="?page=discover" data-page="discover">Discover</a><a href="?page=profile" data-page="profile">Profile</a></nav><div class="wallet">✦ <b id="topPoints">120</b> pts</div></header>
 <main class="wrap"><div id="pageIntro"><strong>CreatorBoost</strong><span>Your creator workspace</span></div>
@@ -155,13 +187,13 @@ button{max-width:100%;white-space:normal}
 </div>
 <div class="stats" id="profileAccountFacts" style="grid-template-columns:repeat(auto-fit,minmax(145px,1fr))"><div class="stat"><span>Member ID</span><strong id="profileMemberId" style="font-size:14px">—</strong></div><div class="stat"><span>Member since</span><strong id="profileJoinedDate" style="font-size:14px">—</strong></div><div class="stat"><span>Account status</span><strong id="profileAccountStatus" style="font-size:14px">Signed in</strong></div><div class="stat"><span>Social profiles</span><strong id="profileSocialCount" style="font-size:14px">0 connected</strong></div></div><div class="panel" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><b>Profile visibility</b><div class="small">Your public links are shown on your CreatorBoost creator card. Never enter passwords or verification codes.</div></div><button class="btn alt" type="button" onclick="showPage('discover')">View Discover</button></div><form class="panel" id="profileForm" style="display:grid;gap:12px">
 <h3>Social media connections</h3><p class="small">Your name and profile photo come from your signed-in account. Just add your social profile links here. You can connect several platforms and disconnect any time.</p>
-<div id="socialConnectBar" class="panel" style="display:grid;grid-template-columns:minmax(110px,.75fr) minmax(160px,1.5fr) auto;gap:10px;align-items:end">
+<div id="socialConnectBar" class="social-connect-panel">
 <label class="small">Choose platform<select class="search" id="socialPlatformChoice"><option>Instagram</option><option>YouTube</option><option>TikTok</option><option>Facebook</option><option>X</option><option>Snapchat</option><option>Twitch</option><option>Kick</option><option>Threads</option><option>Pinterest</option><option>LinkedIn</option><option>Reddit</option></select></label>
 <label class="small">Profile link<input class="search" id="socialPlatformUrl" type="url" placeholder="Paste public profile URL"></label>
-<button class="btn" type="button" id="addSocialConnection">＋ Connect</button>
+<button class="btn social-connect-btn" type="button" id="addSocialConnection"><span aria-hidden="true">＋</span> Connect account</button>
 </div>
-<div class="task" style="padding:14px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Connected accounts</b><span class="small" id="connectedSocialHint">Add your first account</span></div><div id="connectedSocialList" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px;margin-top:12px"><span class="small">No accounts connected yet.</span></div></div>
-<div class="small" id="socialProfileStatus" aria-live="polite">Connections save automatically to your CreatorBoost account.</div>
+<div class="social-connected-panel"><div class="social-connected-heading"><div><b>Connected accounts</b><div class="small">Your saved public profile links</div></div><span class="social-count" id="connectedSocialHint">Add your first account</span></div><div id="connectedSocialList" class="social-connected-list"><span class="small">No accounts connected yet.</span></div></div>
+<div class="small social-save-status" id="socialProfileStatus" aria-live="polite">Connections save automatically to your CreatorBoost account.</div>
 </form>
 
 </div>
