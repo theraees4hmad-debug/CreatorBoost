@@ -195,6 +195,48 @@ button{max-width:100%;white-space:normal}
  .social-connected-list>.task .btn{margin-left:0!important}
 }
 
+
+/* Keep each connected profile URL and Disconnect button fully inside its card */
+.social-connected-list{width:100%;max-width:100%;min-width:0}
+.social-connected-list>.task{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ align-items:stretch!important;
+ justify-content:initial!important;
+ gap:12px!important;
+ width:100%!important;
+ max-width:100%!important;
+ min-width:0!important;
+ overflow:hidden!important;
+}
+.social-connected-list>.task>div{
+ display:flex!important;
+ align-items:flex-start!important;
+ gap:10px!important;
+ width:100%!important;
+ max-width:100%!important;
+ min-width:0!important;
+}
+.social-connected-list>.task>div>div{flex:1 1 auto!important;width:0!important;max-width:100%!important;min-width:0!important;overflow:hidden!important}
+.social-connected-list>.task a{
+ display:block!important;
+ width:100%!important;
+ max-width:100%!important;
+ min-width:0!important;
+ white-space:normal!important;
+ overflow-wrap:anywhere!important;
+ word-break:break-word!important;
+}
+.social-connected-list>.task>.btn{
+ display:block!important;
+ width:100%!important;
+ max-width:100%!important;
+ min-width:0!important;
+ margin:0!important;
+ justify-self:stretch!important;
+ white-space:normal!important;
+}
+
 </style></head><body>
 <header class="top wrap"><div class="brand"><span class="mark">C</span>CreatorBoost</div><nav class="nav" aria-label="Main navigation"><a href="?page=home" data-page="home">Home</a><a href="?page=dashboard" data-page="dashboard">Dashboard</a><a href="?page=earn" data-page="earn">Earn points</a><a href="?page=promote" data-page="promote">Promote</a><a href="?page=buyers" data-page="buyers">Buyers</a><a href="?page=wallet" data-page="wallet">Wallet</a><a href="?page=discover" data-page="discover">Discover</a><a href="?page=profile" data-page="profile">Profile</a></nav><div class="wallet">✦ <b id="topPoints">120</b> pts</div></header>
 <main class="wrap"><div id="pageIntro"><strong>CreatorBoost</strong><span>Your creator workspace</span></div>
