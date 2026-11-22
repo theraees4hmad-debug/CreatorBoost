@@ -28,7 +28,7 @@ Supabase Edge Function folders are present for YouTube OAuth start/callback, con
 
 - Secure points-to-points transfer RPC migration: `202611220010_secure_points_transfers.sql` (prepared in source; must be applied and tested on Supabase before use).
 
-The transfer RPC accepts the recipient's confirmed account email, enforces authenticated sender identity, locks both wallet rows in a stable order, debits/credits within one transaction, writes paired ledger entries, and accepts an idempotency key. The frontend transfer form is not yet connected; do not advertise transfers as live until the migration is applied and two-account tests pass.
+The transfer RPC accepts the recipient's confirmed account email, enforces authenticated sender identity, locks both wallet rows in a stable order, debits/credits within one transaction, writes paired ledger entries, and accepts an idempotency key. The frontend now includes a transfer form and history panel that call these RPCs. The form will remain unavailable until this migration is applied to Supabase. Do not advertise transfers as live until the migration is applied and two-account tests pass.
 
 ## Important production boundaries
 
