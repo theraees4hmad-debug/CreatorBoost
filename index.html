@@ -563,7 +563,7 @@ function campaignText(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;
 async function showCampaigns(){
  const el=document.getElementById("campaignBoard");if(!el)return;
  if(!authClient){el.innerHTML='<div class="muted">Sign in to browse and create featured campaigns.</div>';return;}
- const {data,error}=await authClient.rpc("my_creatorboost_campaigns");if(error){el.innerHTML='<div class="muted">Campaigns unavailable. Please sign in and try again.</div>';return;}
+ const {data,error}=await authClient.rpc("my_creatorboost_campaigns_v2");if(error){el.innerHTML='<div class="muted">Campaigns unavailable. Please sign in and try again.</div>';return;}
  const a=(data||[]).filter(x=>promoteFilter==="All"||x.platform===promoteFilter);
  el.innerHTML=a.length?a.map((x,i)=>{
   const id=campaignText(x.id),mine=!!x.is_mine,paused=x.status==="paused",reward=Number(x.reward_per_creator||10),remaining=Number(x.remaining_budget||0);
