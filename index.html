@@ -87,6 +87,56 @@ input,select{color-scheme:dark}
 .wallet-payment-footer{margin-top:22px;padding:18px;border:1px solid #39466b;border-radius:17px;background:linear-gradient(145deg,#202844,#141a2d)}.wallet-payment-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}.wallet-payment-heading span{font-size:11px;font-weight:850;letter-spacing:1.5px;color:#c8c0ff}.wallet-payment-heading small{font-size:11px;color:var(--muted)}.wallet-payment-logos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.wallet-pay-item{min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 8px;text-align:center;border:1px solid #39466b;border-radius:13px;background:#ffffff08}.wallet-pay-icon{width:53px;height:53px;display:grid;place-items:center;border-radius:15px;background:#fff;box-shadow:0 6px 16px #0003}.wallet-pay-icon svg{width:44px;height:44px}.wallet-bank{background:linear-gradient(145deg,#294b91,#182b56);color:#fff}.wallet-crypto{background:#382b26}.wallet-pay-item b{font-size:13px}.wallet-pay-item small{font-size:10px;line-height:1.35;color:var(--muted)}.wallet-payment-note{margin:13px 0 0;color:var(--muted);font-size:11px;line-height:1.5}@media(max-width:420px){.wallet-payment-footer{padding:13px}.wallet-payment-logos{gap:6px}.wallet-pay-item{padding:10px 4px}.wallet-pay-item b{font-size:11px}.wallet-pay-item small{font-size:9px}.wallet-pay-icon{width:46px;height:46px}.wallet-pay-icon svg{width:39px;height:39px}}
 
 .earn-app-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 10px}.earn-app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:9px;margin-bottom:20px}.earn-app{display:flex;align-items:center;gap:8px;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:13px;background:#171c31;color:#f5f6ff;cursor:pointer;text-align:left}.earn-app b{font-size:12px;overflow-wrap:anywhere}.earn-app.active{border-color:#a99aff;background:#30295c;box-shadow:0 0 0 1px #9a8cff44}.app-logo{width:31px;height:31px;flex:0 0 31px;border-radius:10px;display:grid;place-items:center;color:#fff;font-size:18px;font-weight:900;background:#454b68}.app-all{background:linear-gradient(135deg,#907bff,#4ce0d0);color:#11152a}.app-youtube{background:#ed1d24}.app-instagram{background:linear-gradient(135deg,#7544d8,#ef4c83,#ff9b45)}.app-tiktok{background:#101010;border:1px solid #687080}.app-facebook{background:#1877f2}.app-x{background:#080808}.app-snapchat{background:#f5e500;color:#111}.app-twitch{background:#7045c7}.app-kick{background:#27c66d;color:#071b0e}.app-threads{background:#30343c}.app-pinterest{background:#bd081c}.app-linkedin{background:#0a66c2}.app-reddit{background:#ff4500}.earn-columns{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(230px,.85fr);gap:16px;align-items:start}.earn-task-column,.earn-bid-column{min-width:0;padding:16px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#1b223b,#141a2d)}.earn-column-title{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:12px}.earn-column-title h3,.earn-bid-column h3{margin:0;font-size:18px}.earn-task-column .tasks{grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));margin:0}.earn-bid-column{position:sticky;top:105px}.bid-symbol{width:46px;height:46px;display:grid;place-items:center;margin:14px 0;border-radius:14px;background:linear-gradient(135deg,#907bff,#4ce0d0);color:#11152a;font-size:25px;font-weight:900}.earn-bid-column p,.earn-bid-column li{color:var(--muted);font-size:13px;line-height:1.6}.earn-bid-column ul{padding-left:18px}.earn-bid-column .btn{width:100%;margin:7px 0 10px}.earn-bid-column>.small{display:block;line-height:1.5}@media(max-width:760px){.earn-columns{grid-template-columns:1fr}.earn-bid-column{position:static}.earn-app-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.earn-app{flex-direction:column;justify-content:center;text-align:center;gap:5px;padding:9px 4px}.earn-app b{font-size:11px}.earn-column-title{align-items:flex-start;flex-direction:column}}
+
+/* Adaptive spacing: use the available screen width without clipping */
+:root{--page-gutter:clamp(12px,3.2vw,28px);--section-gap:clamp(22px,4vw,46px);--card-gap:clamp(9px,1.8vw,16px)}
+html{max-width:100%;overflow-x:clip}
+body{min-width:0;max-width:100%;overflow-x:clip}
+.wrap{width:100%;max-width:1150px;padding-left:var(--page-gutter);padding-right:var(--page-gutter)}
+main.wrap{padding-bottom:clamp(20px,4vh,48px)}
+section{margin-top:var(--section-gap)}
+.hero{grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:clamp(16px,3vw,35px)}
+.stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,155px),1fr));gap:var(--card-gap)}
+.cards,.tasks{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:var(--card-gap)}
+.panel,.stat,.creator,.task{min-width:0}
+.panel{padding:clamp(14px,2.2vw,23px)}
+.stat,.creator,.task{padding:clamp(12px,2vw,20px)}
+.head{gap:clamp(9px,2vw,16px);margin-top:clamp(22px,4vh,38px)}
+.head h2{font-size:clamp(21px,3vw,30px)}
+.actions{gap:clamp(7px,1.5vw,12px)}
+.actions .btn{flex:0 1 auto}
+img,svg,video,canvas{max-width:100%}
+input,select,textarea{width:100%;min-width:0}
+button{max-width:100%;white-space:normal}
+#profileForm,#campaignForm,#depositForm,#withdrawForm{width:100%;max-width:760px}
+.earn-columns{grid-template-columns:minmax(0,1.7fr) minmax(0,.85fr);gap:var(--card-gap)}
+@media(max-width:900px){
+ .hero{grid-template-columns:minmax(0,1fr)}
+ .earn-columns{grid-template-columns:minmax(0,1fr)}
+ .earn-bid-column{position:static}
+}
+@media(max-width:600px){
+ .wrap{padding-left:12px;padding-right:12px}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .cards,.tasks{grid-template-columns:minmax(0,1fr)}
+ .head{align-items:stretch}
+ .head>div{min-width:0}
+ .actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr))}
+ .actions .btn{width:100%}
+ .payment-choices{grid-template-columns:minmax(0,1fr)}
+ .wallet-payment-logos{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .earn-app-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:360px){
+ .wrap{padding-left:10px;padding-right:10px}
+ .stats{gap:7px}
+ .stat{padding:10px 8px}
+ .stat strong{font-size:16px}
+ .wallet{padding:7px}
+ .brand{font-size:16px}
+ .mobile-nav{left:5px;right:5px;bottom:5px}
+}
+
 </style></head><body>
 <header class="top wrap"><div class="brand"><span class="mark">C</span>CreatorBoost</div><nav class="nav" aria-label="Main navigation"><a href="?page=home" data-page="home">Home</a><a href="?page=dashboard" data-page="dashboard">Dashboard</a><a href="?page=earn" data-page="earn">Earn points</a><a href="?page=promote" data-page="promote">Promote</a><a href="?page=buyers" data-page="buyers">Buyers</a><a href="?page=wallet" data-page="wallet">Wallet</a><a href="?page=discover" data-page="discover">Discover</a><a href="?page=profile" data-page="profile">Profile</a></nav><div class="wallet">✦ <b id="topPoints">120</b> pts</div></header>
 <main class="wrap"><div id="pageIntro"><strong>CreatorBoost</strong><span>Your creator workspace</span></div>
