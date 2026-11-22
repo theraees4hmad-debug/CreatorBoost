@@ -568,7 +568,7 @@ async function showCampaigns(){
  el.innerHTML=a.length?a.map((x,i)=>{
   const id=campaignText(x.id),mine=!!x.is_mine,paused=x.status==="paused",reward=Number(x.reward_per_creator||10),remaining=Number(x.remaining_budget||0);
   const controls=mine?'<div class="actions" style="margin-top:12px;flex-wrap:wrap"><button class="btn alt" type="button" onclick="editCampaign(\''+id+'\')">Edit details</button><button class="btn alt" type="button" onclick="toggleCampaign(\''+id+'\')">'+(paused?'Resume':'Pause')+'</button><button class="btn alt" type="button" onclick="cancelCampaign(\''+id+'\')">Cancel & refund</button></div><form id="editCampaign-'+id+'" class="panel" style="display:none;gap:9px;margin-top:12px" onsubmit="saveCampaign(event,\''+id+'\')"><label class="small">Campaign name</label><input class="search" name="title" maxlength="70" required value="'+campaignText(x.title)+'"><label class="small">Public profile URL</label><input class="search" name="url" type="url" required value="'+campaignText(x.url)+'"><label class="small">Platform</label><select class="search" name="platform">'+["Instagram","YouTube","TikTok","Facebook","X","Snapchat","Twitch","Kick","Threads","Pinterest","LinkedIn","Reddit"].map(p=>'<option '+(p===x.platform?'selected':'')+'>'+p+'</option>').join("")+'</select><label class="small">Total budget (minimum 10)</label><input class="search" name="bid" type="number" min="10" step="1" required value="'+Number(x.bid||10)+'"><label class="small">Reward per approved creator</label><input class="search" name="reward" type="number" min="1" step="1" required value="'+reward+'"><div class="actions"><button class="btn" type="submit">Save changes</button><button class="btn alt" type="button" onclick="showCampaigns()">Discard</button></div></form>':'';
-  return '<article class="creator"><div class="eyebrow">#'+(i+1)+' · '+(paused?'PAUSED':'FEATURED')+' · '+Number(x.bid||0)+' points</div><h3>'+campaignText(x.title)+'</h3><span class="tag">'+campaignText(x.platform||"Social media")+'</span><p>'+(paused?'This campaign is paused.':'Reward: '+reward+' points per approved creator · Remaining: '+remaining+' points')+'</p><a class="btn alt" style="display:inline-block;text-decoration:none" href="'+campaignText(x.url)+'" target="_blank" rel="noopener">Visit public profile ↗</a>'+(mine?controls:'<div class="actions" style="margin-top:12px"><button class="btn" type="button" onclick="submitCampaignWork(\\''+id+'\\')" '+(remaining<reward?'disabled':'')+'>Submit work for review</button></div>')+'</article>';
+  return '<article class="creator"><div class="eyebrow">#'+(i+1)+' · '+(paused?'PAUSED':'FEATURED')+' · '+Number(x.bid||0)+' points</div><h3>'+campaignText(x.title)+'</h3><span class="tag">'+campaignText(x.platform||"Social media")+'</span><p>'+(paused?'This campaign is paused.':'Reward: '+reward+' points per approved creator · Remaining: '+remaining+' points')+'</p><a class="btn alt" style="display:inline-block;text-decoration:none" href="'+campaignText(x.url)+'" target="_blank" rel="noopener">Visit public profile ↗</a>'+(mine?controls:'<div class="actions" style="margin-top:12px"><button class="btn" type="button" onclick="submitCampaignWork(this.dataset.id)" data-id="'+id+'" '+(remaining<reward?'disabled':'')+>Submit work for review</button></div>')+'</article>';
  }).join(""):'<div class="muted">No featured campaigns yet. Create the first one.</div>';
 }
 function editCampaign(id){let f=document.getElementById("editCampaign-"+id);if(f)f.style.display="grid";}
@@ -724,24 +724,7 @@ async function loadCampaignReviewQueue(){
  const box=document.getElementById("campaignReviewList");if(!box)return;
  const {data,error}=await authClient.rpc("admin_creatorboost_pending_campaign_submissions");
  if(error){box.textContent="Could not load campaign submissions: "+error.message;return;}
- box.innerHTML=(data||[]).length?(data||[]).map(x=>'<article class="creator"><b>'+safeText(x.campaign_title)+'</b><p class="small">Creator: '+safeText(x.user_id)+' · '+new Date(x.submitted_at).toLocaleString()+'</p><p>'+safeText(x.evidence)+'</p><p class="small">Reward: '+Number(x.reward_points)+' points · Campaign remaining: '+Number(x.remaining_budget)+'</p><div class="actions"><button class="btn" onclick="reviewCampaignSubmission(\\''+x.id+'\\',true)">Approve & pay points</button><button class="btn alt" onclick="reviewCampaignSubmission(\\''+x.id+'\\',false)">Reject</button></div></article>').join(""):'<p class="small">No pending campaign submissions.</p>';
-}
-async function reviewCampaignSubmission(id,approve){
- if(!confirm(approve?"Verify the creator's work and pay the campaign reward?":"Reject this campaign submission?"))return;
- const {data,error}=await authClient.rpc("review_creatorboost_campaign_submission",{p_submission_id:id,p_approve:approve});
- if(error){say("Campaign review failed: "+error.message);return;}
- say(approve?"Verified. "+data+" points transferred to the creator.":"Campaign submission rejected; no points paid.");
- await loadCampaignReviewQueue();await showCampaigns();await loadPointsWallet();
-}
-async function reviewTaskSubmission(id,approve){
- if(!confirm(approve?"Confirm evidence is genuine and approve this reward?":"Reject this task submission?"))return;
- const {data,error}=await authClient.rpc("review_creatorboost_task",{p_submission_id:id,p_approve:approve});
- if(error){say("Review failed: "+error.message);return;}
- say(approve?"Verified. "+data+" points awarded automatically.":"Submission rejected; no points awarded.");
- loadTaskReviewQueue();loadTaskSubmissions();
-}
-async function submitTaskForVerification(id){
- const t=tasks.find(x=>x.id===id);if(!t)return;
+ box.innerHTML=(data||[]).length?(data||[]).map(x=>'<article class="creator"><b>'+safeText(x.campaign_title)+'</b><p class="small">Creator: '+safeText(x.user_id)+' · '+new Date(x.submitted_at).toLocaleString()+'</p><p>'+safeText(x.evidence)+'</p><p class="small">Reward: '+Number(x.reward_points)+' points · Campaign remaining: '+Number(x.remaining_budget)+'</p><div class="actions"><button class="btn" onclick="reviewCampaignSubmission(this.dataset.id,true)" data-id="'+x.id+'">Approve & pay points</button><button class="btn alt" onclick="reviewCampaignSubmission(this.dataset.id,false)" data-id="'+x.id+'">x.id===id);if(!t)return;
  if(!authClient){say("Please sign in before submitting a task.");showPage("account");return;}
  const {data:{session}}=await authClient.auth.getSession();
  if(!session){say("Please sign in before submitting a task.");showPage("account");return;}
