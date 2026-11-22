@@ -1113,4 +1113,72 @@ showPage(new URLSearchParams(location.search).get("page")||"home",false);handleY
  update();render();
 })();
 
+</script><style id="CB_HARD_PAGE_ROUTER_V1">main.wrap>section[hidden]{display:none!important}</style>
+<script id="CB_HARD_PAGE_ROUTER_V1">
+(function(){
+ const groups={
+  home:[".hero","#getting-started","section.stats"],
+  dashboard:["#stats"],
+  earn:["#earn","#discover"],
+  promote:["#campaigns"],
+  wallet:["#walletActions"],
+  profile:["#join"],
+  chat:["#chatPage"],
+  account:["#account"],
+  buyers:["#buyers","#packages"],
+  discover:["#discover"],
+  admin:["#adminReviewPage"]
+ };
+ const labels={
+  home:["Home","Your creator growth starts here."],
+  dashboard:["Dashboard","Your points, activity and campaign overview."],
+  earn:["Earn points","Genuine creator-community opportunities."],
+  promote:["Promote","Feature your creator profile with points."],
+  wallet:["Wallet","Your points and transactions."],
+  profile:["Profile","Manage your creator identity and social profiles."],
+  chat:["Messages","Chat privately with other creators."],
+  account:["Account","Manage your CreatorBoost sign-in."],
+  buyers:["Services","Creator services marketplace."],
+  discover:["Discover","Find real creator profiles."],
+  admin:["Admin controls","Review submissions and payouts."]
+ };
+ function route(page,addHistory){
+  if(page==="stats")page="dashboard";
+  if(page==="user")page="profile";
+  if(!groups[page])page="home";
+  document.querySelectorAll("main.wrap>section").forEach(el=>{el.hidden=true;});
+  (groups[page]||groups.home).forEach(sel=>document.querySelectorAll(sel).forEach(el=>{el.hidden=false;}));
+  const intro=document.getElementById("pageIntro"),label=labels[page]||labels.home;
+  if(intro)intro.innerHTML="<strong>"+label[0]+"</strong><span>"+label[1]+"</span>";
+  document.querySelectorAll("[data-page]").forEach(a=>{
+   if(a.dataset.page===page)a.setAttribute("aria-current","page");
+   else a.removeAttribute("aria-current");
+  });
+  const menu=document.getElementById("navMoreMenu"),toggle=document.querySelector(".nav-more-toggle");
+  if(menu)menu.hidden=true;
+  if(toggle)toggle.setAttribute("aria-expanded","false");
+  if(addHistory)history.pushState({page:page},"","?page="+encodeURIComponent(page));
+  if(page==="chat"&&typeof initCreatorChat==="function")initCreatorChat();
+  if(page==="earn"){
+   if(typeof loadEarnCampaigns==="function")loadEarnCampaigns();
+   if(typeof showCreators==="function")showCreators();
+  }
+  if(page==="promote"){
+   if(typeof loadProfilePromotions==="function")loadProfilePromotions();
+   if(typeof showCampaigns==="function")showCampaigns();
+  }
+  window.scrollTo({top:0,behavior:"instant"});
+ }
+ window.showPage=route;
+ document.addEventListener("click",function(e){
+  const a=e.target&&e.target.closest?e.target.closest("a[data-page]"):null;
+  if(!a)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  route(a.dataset.page,true);
+ },true);
+ window.addEventListener("popstate",function(){
+  route(new URLSearchParams(location.search).get("page")||"home",false);
+ });
+ route(new URLSearchParams(location.search).get("page")||"home",false);
+})();
 </script></body></html>
