@@ -181,6 +181,20 @@ button{max-width:100%;white-space:normal}
  .social-connect-panel .social-connect-btn{width:100%}
 }
 
+
+/* Add clear visual separation between Connect account and Disconnect controls */
+#profileForm>.social-connect-panel{margin-bottom:22px}
+#profileForm>.social-connected-panel{margin-top:18px}
+.social-connected-list>.task{gap:20px!important}
+.social-connected-list>.task>div{flex:1 1 auto;min-width:0}
+.social-connected-list>.task .btn{margin-left:12px!important}
+@media(max-width:520px){
+ #profileForm>.social-connect-panel{margin-bottom:18px}
+ #profileForm>.social-connected-panel{margin-top:16px}
+ .social-connected-list>.task{gap:14px!important}
+ .social-connected-list>.task .btn{margin-left:0!important}
+}
+
 </style></head><body>
 <header class="top wrap"><div class="brand"><span class="mark">C</span>CreatorBoost</div><nav class="nav" aria-label="Main navigation"><a href="?page=home" data-page="home">Home</a><a href="?page=dashboard" data-page="dashboard">Dashboard</a><a href="?page=earn" data-page="earn">Earn points</a><a href="?page=promote" data-page="promote">Promote</a><a href="?page=buyers" data-page="buyers">Buyers</a><a href="?page=wallet" data-page="wallet">Wallet</a><a href="?page=discover" data-page="discover">Discover</a><a href="?page=profile" data-page="profile">Profile</a></nav><div class="wallet">✦ <b id="topPoints">120</b> pts</div></header>
 <main class="wrap"><div id="pageIntro"><strong>CreatorBoost</strong><span>Your creator workspace</span></div>
