@@ -648,7 +648,7 @@ async function loadTaskSubmissions(){
    const mount=document.getElementById("adminReviewMount");
    if(mount&&panel.parentElement!==mount)mount.appendChild(panel);
    panel.style.display="block";
-   loadTaskReviewQueue();loadWithdrawalReviewQueue();loadPaymentReviewQueue();
+   loadTaskReviewQueue();loadCampaignReviewQueue();loadWithdrawalReviewQueue();loadPaymentReviewQueue();
   }else{panel.style.display="none";document.getElementById("adminPageButton")?.remove();}
  }
  const {data,error}=await authClient.rpc("my_creatorboost_task_submissions");
