@@ -307,6 +307,10 @@ button{max-width:100%;white-space:normal}
 #cbSpinWheel .cb-spin-result{background:#0a0b10aa;border:1px solid #d5ae6155}
 #cbSpinWheel .cb-spin-actions .btn:first-child{background:linear-gradient(135deg,#f5d88d,#b67a2b);color:#27170b;border:1px solid #ffe8ad;font-weight:900;box-shadow:0 5px 18px #c18a3540}
 #cbSpinWheel .cb-spin-note{color:#d8c8a9}
+#cbSpinWheel .cb-virtual-bid{display:grid;gap:7px;margin:14px 0;padding:12px;border:1px solid #d5ae6155;border-radius:12px;background:#fffaf00c}
+#cbSpinWheel .cb-virtual-bid label{color:#fff0ca;font-weight:800;font-size:13px}
+#cbSpinWheel .cb-virtual-bid input{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid #d5ae6188;border-radius:9px;background:#11131a;color:#fff;font:inherit;font-weight:800}
+#cbSpinWheel .cb-virtual-bid small{color:#d8c8a9;line-height:1.5}
 #cbSpinWheel .cb-casino-kicker{color:#f3cf83;letter-spacing:2px;font-size:11px;font-weight:900;text-transform:uppercase}
 #cbSpinWheel .cb-casino-title{color:#fff0ca;font-size:clamp(24px,4vw,32px);margin:5px 0}
 #cbSpinWheel .cb-casino-subtitle{color:#d8c8a9;margin:0 0 14px}
@@ -336,7 +340,7 @@ button{max-width:100%;white-space:normal}
 <section id="walletActions"><div class="head"><div><div class="eyebrow">Your CreatorBoost wallet</div><h2>Deposit & withdraw</h2><p>Add funds for campaigns or request a payout for eligible earned points.</p></div></div><div class="panel" style="max-width:760px"><div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr));margin:0 0 14px"><div class="stat"><span>Available points</span><strong id="walletPoints">120 ✦</strong></div><div class="stat"><span>Cash balance</span><strong>₹0.00</strong><span>Cash balance is not connected yet</span></div></div><div class="actions wallet-actions" style="margin-top:8px"><button class="btn" type="button" onclick="document.getElementById('depositForm').style.display='grid';document.getElementById('depositForm').scrollIntoView({behavior:'smooth',block:'center'})">＋ Deposit</button><button class="btn alt" type="button" onclick="document.getElementById('withdrawForm').style.display='grid';document.getElementById('withdrawForm').scrollIntoView({behavior:'smooth',block:'center'})">↗ Withdraw</button></div><form id="depositForm" style="display:none;gap:10px;margin-top:18px"><h3 style="margin:0">Add funds</h3><p class="small">First review the UPI, bank or crypto payment instructions in the Buyers section. After paying, submit your transaction reference here for manual verification.</p><label class="small" for="depositAmount">Deposit amount (INR ₹)</label><input class="search" id="depositAmount" type="number" min="1" step="1" placeholder="Enter amount" required><label class="small" for="depositMethod">Payment method</label><select class="search" id="depositMethod" required><option value="">Choose payment method</option><option>UPI</option><option>Bank transfer</option><option>Crypto</option></select><div id="depositDestinationPreview" class="panel" style="display:none;margin:4px 0 8px;background:rgba(255,255,255,.03)"><div class="small">Payment destination will appear here after you choose a method.</div></div><label class="small" for="depositReference">UTR / transaction ID / crypto transaction hash</label><input class="search" id="depositReference" placeholder="Enter transaction reference" required><button class="btn" type="submit">Submit deposit for verification</button><div id="depositNotice" class="small" role="status"></div></form><form id="withdrawForm" style="display:none;gap:10px;margin-top:18px"><h3 style="margin:0">Request a withdrawal</h3><p class="small">Rate: 100 points = ₹1. Minimum payout: ₹10 (1,000 points). Maximum payout: ₹50 (5,000 points) per request. Payouts require admin approval.</p><div class="panel" style="padding:12px;margin:8px 0"><div class="small">Your available points</div><strong id="withdrawAvailablePoints">0 ✦</strong><div class="small" id="withdrawMaxHint">Maximum eligible withdrawal: ₹0</div></div><label class="small" for="withdrawPoints">Points to redeem (100 points = ₹1)</label><div class="actions" style="display:flex;gap:8px;align-items:center"><input class="search" id="withdrawPoints" type="number" min="1000" max="5000" step="100" placeholder="Enter points" required style="flex:1"><button class="btn alt" type="button" id="withdrawMaxBtn">Use max</button></div><label class="small" for="withdrawAmount">Estimated payout (INR ₹)</label><input class="search" id="withdrawAmount" type="number" min="10" max="50" step="1" placeholder="Enter payout amount" required><label class="small" for="withdrawMethod">Payout method</label><select class="search" id="withdrawMethod" required><option value="">Choose payout method</option><option>UPI</option><option>Bank transfer</option><option>Crypto</option></select><label class="small" for="withdrawDestination">UPI ID, bank details or wallet address</label><input class="search" id="withdrawDestination" placeholder="Enter your payout destination" required><button class="btn" type="submit">Submit withdrawal request</button><div id="withdrawNotice" class="small" role="status"></div></form></div><div class="wallet-payment-footer"><div class="wallet-payment-heading"><span>PAYMENT METHODS</span><small>Available options</small></div><div class="wallet-payment-logos"><div class="wallet-pay-item"><span class="wallet-pay-icon wallet-upi"><svg viewBox="0 0 64 40" role="img" aria-label="UPI"><path d="M8 5h10L9 35H0z" fill="#6b3fa0"/><path d="M24 5h10L25 35H15z" fill="#ed752e"/><path d="M42 5h17v7H45l-2 5h12v7H40l-2 5h20v6H26z" fill="#3b9c62"/></svg></span><b>UPI</b><small>Google Pay · PhonePe · Paytm</small></div><div class="wallet-pay-item"><span class="wallet-pay-icon wallet-bank"><svg viewBox="0 0 48 48" role="img" aria-label="Bank transfer"><path d="M5 17 24 6l19 11H5Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M8 40h32M5 44h38M12 19v18m8-18v18m8-18v18m8-18v18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></span><b>Bank transfer</b><small>NEFT · IMPS · RTGS</small></div><div class="wallet-pay-item"><span class="wallet-pay-icon wallet-crypto"><svg viewBox="0 0 48 48" role="img" aria-label="Crypto"><circle cx="24" cy="24" r="21" fill="#f7931a"/><path d="M29.8 13.2c5 .9 6.7 4.1 5.6 7.5-.6 1.8-1.8 2.8-3.6 3.4 2.8 1.2 4.1 3.5 3.3 6.5-1 4-4.5 5.8-9.6 5.6l-.8 4h-4l.8-4h-3l-.8 4h-4l.8-4h-3.2l.8-4h3.1l3.1-16.1h-3.2l.8-4h3.1l.8-4h4l-.8 4h3l.8-4h4l-.8 4.1Zm-7 4.1-1.1 5.8h4c2.4 0 3.8-.8 4.2-2.7.4-2-1-3.1-3.4-3.1Zm-1.8 9.5-1.2 6.3h4.6c2.6 0 4.1-.9 4.5-2.9.4-2.2-1-3.4-3.8-3.4Z" fill="#fff" transform="translate(2 -1) scale(.9)"/></svg></span><b>Crypto</b><small>Supported wallet networks</small></div></div><p class="wallet-payment-note">Choose a method when submitting a deposit or withdrawal request. Payments are not processed automatically.</p></div><div class="small" style="margin-top:10px">Deposits and cash conversion are still preview-only. Withdrawal requests are stored securely, reserve points, and require manual admin payout approval; no automatic transfer is made.</div><div id="games" class="wallet-wheel-embed">
  <div class="head"><div><div class="eyebrow">WALLET ARCADE</div><h2>Lucky Wheel</h2><p>Free virtual play — your real wallet balance is never used.</p></div></div>
  <div id="cbSpinWheel">
-  <div class="cb-casino-kicker">✦ CREATORBOOST LUCKY CLUB ✦</div><h2 class="cb-casino-title">TRY YOUR LUCK</h2><p class="cb-casino-subtitle">Try seven virtual outcomes using a fixed 10-credit arcade score. No real-money stakes.</p>
+  <div class="cb-casino-kicker">✦ CREATORBOOST LUCKY CLUB ✦</div><h2 class="cb-casino-title">TRY YOUR LUCK</h2><p class="cb-casino-subtitle">Choose any virtual bid. Multipliers calculate from your bid; fixed outcomes stay fixed. No real-money stakes.</p>
   <div class="cb-spin-layout">
    <div class="cb-wheel-stage"><div class="cb-wheel-pointer"></div>
     <div class="cb-wheel" id="cbSpinDisc" role="img" aria-label="Casino-style virtual prize wheel with game coin prizes and lose spaces">
@@ -347,8 +351,9 @@ button{max-width:100%;white-space:normal}
    <div class="cb-spin-side">
     <div class="cb-spin-stats"><div class="cb-spin-stat"><b id="cbSpinCoins">0</b><span>Game coins</span></div><div class="cb-spin-stat"><b id="cbSpinWins">0</b><span>Wins</span></div><div class="cb-spin-stat"><b id="cbSpinLosses">0</b><span>Losses</span></div></div>
     <div class="cb-spin-result" aria-live="polite"><strong id="cbSpinHeadline">Ready to spin?</strong><small id="cbSpinMessage">Your first spin is free.</small></div>
-    <div class="cb-spin-actions"><button class="btn" id="cbSpinButton" type="button">🎡 SPIN FREE</button><button class="btn alt" id="cbSpinReset" type="button">Reset game</button></div>
-    <p class="cb-spin-note">All results use virtual arcade credits only. The 10-credit base is not a deposit or real-money bid. Negative results can reduce only your virtual arcade score; your CreatorBoost wallet points and cash are never affected.</p>
+    <div class="cb-virtual-bid"><label for="cbVirtualBid">Your virtual bid (points)</label><input id="cbVirtualBid" type="number" min="1" max="1000000" step="1" value="10" inputmode="numeric" aria-describedby="cbBidPreview"><small id="cbBidPreview">Possible results: 2x +20 · -2x -20 · +500 +500 · +100 +100 · -300 -300 · +1 +1 · 5x +50 virtual credits.</small></div>
+    <div class="cb-spin-actions"><button class="btn" id="cbSpinButton" type="button">🎡 SPIN</button><button class="btn alt" id="cbSpinReset" type="button">Reset game</button></div>
+    <p class="cb-spin-note">The selected bid is only a virtual calculation base. The result is added to or subtracted from your virtual arcade score; no separate stake is deducted. No deposits, cash, withdrawals, or CreatorBoost wallet points are used.</p>
    </div>
   </div>
  </div>
@@ -739,42 +744,54 @@ document.querySelectorAll("[data-page]").forEach(a=>a.addEventListener("click",e
 const moreToggle=document.querySelector(".nav-more-toggle"),moreMenu=document.getElementById("navMoreMenu");if(moreToggle&&moreMenu){moreToggle.addEventListener("click",()=>{const open=moreMenu.hidden;moreMenu.hidden=!open;moreToggle.setAttribute("aria-expanded",String(open));});document.addEventListener("click",e=>{if(!moreMenu.hidden&&!moreMenu.contains(e.target)&&!moreToggle.contains(e.target)){moreMenu.hidden=true;moreToggle.setAttribute("aria-expanded","false");}});}
 showPage(new URLSearchParams(location.search).get("page")||"home",false);handleYouTubeOAuthReturn();
 
-/* Free, non-cash spin wheel. Independent of deposits and the CreatorBoost wallet. */
+/* Free virtual-credit wheel. It never reads or changes the CreatorBoost wallet. */
 (()=>{
- const disc=document.getElementById("cbSpinDisc"),spin=document.getElementById("cbSpinButton"),reset=document.getElementById("cbSpinReset");
- if(!disc||!spin||!reset)return;
- const baseVirtualBid=10;const prizes=[{label:"2x",delta:baseVirtualBid*2,win:true},{label:"-2x",delta:-baseVirtualBid*2,win:false},{label:"+500",delta:500,win:true},{label:"+100",delta:100,win:true},{label:"-300",delta:-300,win:false},{label:"+1",delta:1,win:true},{label:"5x",delta:baseVirtualBid*5,win:true}];
+ const disc=document.getElementById("cbSpinDisc"),spin=document.getElementById("cbSpinButton"),reset=document.getElementById("cbSpinReset"),bidInput=document.getElementById("cbVirtualBid"),preview=document.getElementById("cbBidPreview");
+ if(!disc||!spin||!reset||!bidInput||!preview)return;
  const storageKey="creatorboost_virtual_wheel_v2";
  let data={coins:0,wins:0,losses:0,history:[],rotation:0,busy:false};
  try{const saved=JSON.parse(localStorage.getItem(storageKey)||"null");if(saved&&Number.isFinite(saved.coins)){data.coins=Math.max(0,saved.coins|0);data.wins=Math.max(0,saved.wins|0);data.losses=Math.max(0,saved.losses|0);data.history=Array.isArray(saved.history)?saved.history.slice(0,8):[];}}catch(e){}
  const $=id=>document.getElementById(id);
+ const validBid=()=>Number.isSafeInteger(Number(bidInput.value))&&Number(bidInput.value)>=1&&Number(bidInput.value)<=1000000;
+ const fmt=n=>Number(n).toLocaleString("en-IN");
+ const getPrizes=()=>{const bid=Number(bidInput.value);return [
+  {label:"2x",delta:bid*2,win:true},{label:"-2x",delta:-bid*2,win:false},
+  {label:"+500",delta:500,win:true},{label:"+100",delta:100,win:true},
+  {label:"-300",delta:-300,win:false},{label:"+1",delta:1,win:true},
+  {label:"5x",delta:bid*5,win:true}
+ ];};
+ function updatePreview(){
+  if(!validBid()){preview.textContent="Enter a whole-number virtual bid from 1 to 1,000,000.";spin.disabled=true;return;}
+  const p=getPrizes();preview.textContent="Possible results: "+p.map(x=>x.label+" "+(x.delta>0?"+":"")+fmt(x.delta)).join(" · ")+" virtual credits.";
+  spin.disabled=data.busy;
+ }
  function save(){try{localStorage.setItem(storageKey,JSON.stringify({coins:data.coins,wins:data.wins,losses:data.losses,history:data.history}));}catch(e){}}
  function render(){
-  $("cbSpinCoins").textContent=data.coins;$("cbSpinWins").textContent=data.wins;$("cbSpinLosses").textContent=data.losses;
+  $("cbSpinCoins").textContent=fmt(data.coins);$("cbSpinWins").textContent=data.wins;$("cbSpinLosses").textContent=data.losses;
   $("cbSpinHistory").innerHTML=data.history.length?data.history.map(x=>"<div style='display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #ffffff18'><span>"+x.label+"</span><small>"+x.time+"</small></div>").join(""):"No spins yet. Try your luck!";
  }
+ bidInput.addEventListener("input",updatePreview);
  spin.addEventListener("click",()=>{
-  if(data.busy)return;
-  data.busy=true;spin.disabled=true;$("cbSpinHeadline").textContent="Spinning…";$("cbSpinMessage").textContent="Let's see where it lands.";
-  const index=Math.floor(Math.random()*prizes.length),prize=prizes[index];
-  const segment=360/prizes.length;const target=((360-(index*segment+segment/2))%360+360)%360;
-  const current=((data.rotation%360)+360)%360;
-  const extra=(target-current+360)%360;
-  data.rotation+=360*6+extra;
-  disc.style.transform="rotate("+data.rotation+"deg)";
+  if(data.busy||!validBid())return;
+  const prizes=getPrizes(),segment=360/prizes.length,index=Math.floor(Math.random()*prizes.length),prize=prizes[index];
+  data.busy=true;spin.disabled=true;reset.disabled=true;bidInput.disabled=true;
+  $("cbSpinHeadline").textContent="Spinning…";$("cbSpinMessage").textContent="Let's see where it lands.";
+  const target=((360-(index*segment+segment/2))%360+360)%360,current=((data.rotation%360)+360)%360,extra=(target-current+360)%360;
+  data.rotation+=360*6+extra;disc.style.transform="rotate("+data.rotation+"deg)";
   window.setTimeout(()=>{
-   data.busy=false;spin.disabled=false;
-   data.coins=Math.max(0,data.coins+prize.delta);if(prize.win){data.wins++;$("cbSpinHeadline").textContent="🎉 "+prize.label+" · +"+prize.delta+" credits";$("cbSpinMessage").textContent="Virtual arcade credits added to your game score.";}
-   else{data.losses++;$("cbSpinHeadline").textContent="😅 "+prize.label+" · "+prize.delta+" credits";$("cbSpinMessage").textContent="Virtual arcade score adjusted only. Your real wallet is untouched.";}
-   data.history.unshift({label:prize.label+" · "+(prize.delta>0?"+":"")+prize.delta+" virtual credits",time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})});data.history=data.history.slice(0,8);save();render();
+   data.busy=false;reset.disabled=false;bidInput.disabled=false;
+   const before=data.coins;data.coins=Math.max(0,data.coins+prize.delta);const applied=data.coins-before;
+   if(prize.win){data.wins++;$("cbSpinHeadline").textContent="🎉 "+prize.label+" · +"+fmt(prize.delta)+" credits";$("cbSpinMessage").textContent="Virtual arcade credits added to your game score.";}
+   else{data.losses++;$("cbSpinHeadline").textContent="😅 "+prize.label+" · "+fmt(prize.delta)+" credits";$("cbSpinMessage").textContent=applied===0?"Your virtual score is already zero; it cannot go below zero.":"Virtual arcade score adjusted only. Your real wallet is untouched.";}
+   data.history.unshift({label:prize.label+" · "+(applied>0?"+":"")+fmt(applied)+" virtual credits (bid "+fmt(Number(bidInput.value))+")",time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})});data.history=data.history.slice(0,8);
+   save();render();updatePreview();
   },4300);
  });
  reset.addEventListener("click",()=>{
   if(data.busy)return;
   data.coins=0;data.wins=0;data.losses=0;data.history=[];data.rotation=0;disc.style.transition="none";disc.style.transform="rotate(0deg)";void disc.offsetWidth;disc.style.transition="transform 4.2s cubic-bezier(.12,.72,.08,1)";
-  $("cbSpinHeadline").textContent="Score reset";$("cbSpinMessage").textContent="Ready for a fresh game.";save();render();
+  $("cbSpinHeadline").textContent="Score reset";$("cbSpinMessage").textContent="Ready for a fresh game.";save();render();updatePreview();
  });
- render();
+ render();updatePreview();
 })();
-
 </script></body></html>
