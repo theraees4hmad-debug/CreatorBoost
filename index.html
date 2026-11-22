@@ -210,9 +210,36 @@ function cancelCampaign(id){let a=JSON.parse(localStorage.getItem("cb_campaigns"
 document.getElementById("campaignForm")?.addEventListener("submit",e=>{e.preventDefault();let bid=Number(document.getElementById("campaignBid").value);if(!Number.isFinite(bid)||bid<10){say("Minimum bid is 10 points.");return;}if(bid>points){say("Not enough points. Earn more points first.");return;}let a=JSON.parse(localStorage.getItem("cb_campaigns")||"[]");a.push({id:Date.now(),title:document.getElementById("campaignTitle").value.trim(),url:document.getElementById("campaignUrl").value.trim(),platform:document.getElementById("campaignPlatform").value,bid,at:Date.now()});localStorage.setItem("cb_campaigns",JSON.stringify(a));points-=bid;localStorage.setItem("cb_points",points);logActivity("Points spent","Campaign bid: "+document.getElementById("campaignTitle").value.trim(),-bid);e.target.reset();wallet();showCampaigns();updateChecklist();say("Demo campaign submitted and "+bid+" points deducted.");});
 function platformIcon(p){return ({YouTube:"▶",Instagram:"◎",TikTok:"♪",Facebook:"f",X:"𝕏",Snapchat:"👻",Twitch:"🟣",Kick:"⚡",Threads:"＠",Pinterest:"📌",LinkedIn:"in",Reddit:"●"})[p]||"🌐";}
 function showCreators(){let q=document.getElementById("search").value.trim().toLowerCase(),all=[...creators,...JSON.parse(localStorage.getItem("cb_profiles")||"[]")],a=all.filter(c=>{let roots={Instagram:"https://www.instagram.com/",YouTube:"https://www.youtube.com/@",TikTok:"https://www.tiktok.com/@",Facebook:"https://www.facebook.com/",X:"https://x.com/",Snapchat:"https://www.snapchat.com/add/",Twitch:"https://www.twitch.tv/",Kick:"https://kick.com/",Threads:"https://www.threads.net/@",Pinterest:"https://www.pinterest.com/",LinkedIn:"https://www.linkedin.com/in/",Reddit:"https://www.reddit.com/user/"},url=c.url||(roots[c.p]||"")+String(c.h||"").replace(/^@/,""),hay=[c.n,c.h,c.p,url].join(" ").toLowerCase(),clean=x=>x.replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/$/,"");return (filter==="All"||c.p===filter)&&(!q||hay.includes(q)||clean(hay).includes(clean(q)));});document.getElementById("creatorList").innerHTML=a.length?a.map(c=>'<article class="creator"><div class="creatorhead"><div class="face">'+c.e+'</div><div><h3>'+c.n+'</h3><div class="handle">'+c.h+'</div><span class="tag">'+platformIcon(c.p)+' '+c.p+'</span></div></div><p>'+c.d+'</p><div class="foot"><span>'+c.f+' followers</span><button class="btn alt" style="padding:7px 10px;font-size:12px" onclick="say(\'Creator profile preview — connection feature coming soon.\')">View profile ↗</button></div></article>').join(''):'<div class="muted">No creators match that search.</div>'}
-let earnFilter="All";function showTasks(){let list=tasks.filter(t=>earnFilter==="All"||t.p==="All"||t.p===earnFilter);document.getElementById("taskList").innerHTML=list.map(t=>{let d=done.includes(t.id);return '<article class="task"><div class="reward">+'+t.v+' points</div><h3>'+t.n+'</h3><p>'+t.d+'</p><button class="btn '+(d?'alt':'')+'" '+(d?'disabled':'')+' onclick="complete(\''+t.id+'\')">'+(d?'✓ Completed':'Complete task')+'</button></article>'}).join("")}
-function complete(id){if(done.includes(id))return;let t=tasks.find(x=>x.id===id);done.push(id);points+=t.v;localStorage.setItem("cb_done",JSON.stringify(done));localStorage.setItem("cb_points",points);logActivity("Points earned",t.n,t.v);wallet();showTasks();updateChecklist();say(t.v+" demo points added to your wallet!")}
-document.getElementById("promotePlatforms").addEventListener("click",e=>{let b=e.target.closest("[data-promote-platform]");if(!b)return;promoteFilter=b.dataset.promotePlatform;document.querySelectorAll("#promotePlatforms .chip").forEach(x=>x.classList.toggle("active",x===b));showCampaigns()});document.getElementById("earnPlatforms").addEventListener("click",e=>{let b=e.target.closest("[data-earn-platform]");if(!b)return;earnFilter=b.dataset.earnPlatform;document.querySelectorAll("#earnPlatforms .earn-app").forEach(x=>x.classList.toggle("active",x===b));showTasks()});document.getElementById("search").addEventListener("input",showCreators);document.getElementById("filters").addEventListener("click",e=>{let b=e.target.closest("[data-filter]");if(!b)return;filter=b.dataset.filter;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x===b));showCreators()});wallet();showCreators();showTasks();showCampaigns();renderStats();renderBuyerOrders();updateChecklist();
+let earnFilter="All",verifiedTaskState={};
+async function loadTaskSubmissions(){
+ if(!authClient)return;
+ const {data,error}=await authClient.rpc("my_creatorboost_task_submissions");
+ if(error){console.warn("Task status unavailable:",error.message);return;}
+ verifiedTaskState={};(data||[]).forEach(x=>verifiedTaskState[x.task_id]=x.status);
+ showTasks();
+}
+function showTasks(){
+ let list=tasks.filter(t=>earnFilter==="All"||t.p==="All"||t.p===earnFilter);
+ document.getElementById("taskList").innerHTML=list.map(t=>{
+  let status=verifiedTaskState[t.id]||"not_submitted";
+  let label=status==="approved"?"✓ Verified · points awarded":status==="pending"?"Under verification":status==="rejected"?"Rejected · contact support":"Submit for verification";
+  let disabled=status==="approved"||status==="pending";
+  return '<article class="task"><div class="reward">Up to '+t.v+' points</div><h3>'+t.n+'</h3><p>'+t.d+'</p><div class="small">Status: '+status.replace(/_/g," ")+'</div><button class="btn '+(disabled?'alt':'')+'" '+(disabled?'disabled':'')+' onclick="submitTaskForVerification(\''+t.id+'\')">'+label+'</button></article>';
+ }).join("");
+}
+async function submitTaskForVerification(id){
+ const t=tasks.find(x=>x.id===id);if(!t)return;
+ if(!authClient){say("Please sign in before submitting a task.");showPage("account");return;}
+ const {data:{session}}=await authClient.auth.getSession();
+ if(!session){say("Please sign in before submitting a task.");showPage("account");return;}
+ const evidence=prompt("Paste a public link or describe exactly what you did. Do not share passwords, OTPs or private information:");
+ if(!evidence||!evidence.trim())return;
+ const {data,error}=await authClient.rpc("submit_creatorboost_task",{p_task_id:id,p_evidence:evidence.trim()});
+ if(error){say("Submission failed: "+error.message);return;}
+ verifiedTaskState[id]="pending";showTasks();
+ say("Task submitted. Points are awarded only after genuine verification.");
+}
+document.getElementById("promotePlatforms").addEventListener("click",e=>{let b=e.target.closest("[data-promote-platform]");if(!b)return;promoteFilter=b.dataset.promotePlatform;document.querySelectorAll("#promotePlatforms .chip").forEach(x=>x.classList.toggle("active",x===b));showCampaigns()});document.getElementById("earnPlatforms").addEventListener("click",e=>{let b=e.target.closest("[data-earn-platform]");if(!b)return;earnFilter=b.dataset.earnPlatform;document.querySelectorAll("#earnPlatforms .earn-app").forEach(x=>x.classList.toggle("active",x===b));showTasks()});document.getElementById("search").addEventListener("input",showCreators);document.getElementById("filters").addEventListener("click",e=>{let b=e.target.closest("[data-filter]");if(!b)return;filter=b.dataset.filter;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x===b));showCreators()});wallet();showCreators();showTasks();showCampaigns();renderStats();renderBuyerOrders();updateChecklist();loadTaskSubmissions();
 
 function showPage(page,addHistory=true){
  const allowed=["home","dashboard","earn","promote","buyers","wallet","discover","profile","account"];
