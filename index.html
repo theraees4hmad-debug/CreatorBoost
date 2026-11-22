@@ -740,17 +740,46 @@ async function loadTaskReviewQueue(){
 
 async function loadCampaignReviewQueue(){
  const box=document.getElementById("campaignReviewList");if(!box)return;
+ if(!authClient){box.textContent="Sign in with an authorized reviewer account to view submissions.";return;}
  const {data,error}=await authClient.rpc("admin_creatorboost_pending_campaign_submissions");
  if(error){box.textContent="Could not load campaign submissions: "+error.message;return;}
- box.innerHTML=(data||[]).length?(data||[]).map(x=>'<article class="creator"><b>'+safeText(x.campaign_title)+'</b><p class="small">Creator: '+safeText(x.user_id)+' · '+new Date(x.submitted_at).toLocaleString()+'</p><p>'+safeText(x.evidence)+'</p><p class="small">Reward: '+Number(x.reward_points)+' points · Campaign remaining: '+Number(x.remaining_budget)+'</p><div class="actions"><button class="btn" onclick="reviewCampaignSubmission(this.dataset.id,true)" data-id="'+x.id+'">Approve & pay points</button><button class="btn alt" onclick="reviewCampaignSubmission(this.dataset.id,false)" data-id="'+x.id+'">x.id===id);if(!t)return;
+ box.innerHTML=(data||[]).length?(data||[]).map(x=>'<article class="creator"><b>'+safeText(x.campaign_title)+'</b><p class="small">Creator: '+safeText(x.user_id)+' · '+new Date(x.submitted_at).toLocaleString()+'</p><p>'+safeText(x.evidence)+'</p><p class="small">Reward: '+Number(x.reward_points)+' points · Campaign remaining: '+Number(x.remaining_budget)+' points</p><div class="actions"><button class="btn" type="button" onclick="reviewCampaignSubmission(this.dataset.id,true)" data-id="'+safeText(x.id)+'">Approve & pay points</button><button class="btn alt" type="button" onclick="reviewCampaignSubmission(this.dataset.id,false)" data-id="'+safeText(x.id)+'">Reject</button></div></article>').join(""):'<p class="small">No pending campaign submissions.</p>';
+}
+async function reviewCampaignSubmission(id,approve){
+ if(!authClient)return;
+ const {data,error}=await authClient.rpc("review_creatorboost_campaign_submission",{p_submission_id:id,p_approve:!!approve});
+ if(error){say("Campaign review failed: "+error.message);return;}
+ say(approve?"Campaign approved. "+Number(data||0)+" points paid to the creator.":"Campaign submission rejected.");
+ await loadCampaignReviewQueue();await loadPointsWallet();showCampaigns();
+}
+async function submitCampaignWork(id){
+ if(!authClient){say("Please sign in before submitting campaign work.");showPage("account");return;}
+ const evidence=prompt("Paste a public evidence link or describe your completed campaign work for admin review:");
+ if(evidence===null)return;
+ if(evidence.trim().length<3){say("Please add at least 3 characters of evidence.");return;}
+ const {error}=await authClient.rpc("submit_creatorboost_campaign",{p_campaign_id:id,p_evidence:evidence.trim()});
+ if(error){say("Campaign submission failed: "+error.message);return;}
+ say("Campaign work submitted for review. Points are paid only after approval.");await loadCampaignReviewQueue();showCampaigns();
+}
+async function submitTaskForVerification(id){
+ const t=tasks.find(x=>x.id===id);if(!t)return;
  if(!authClient){say("Please sign in before submitting a task.");showPage("account");return;}
  const {data:{session}}=await authClient.auth.getSession();
  if(!session){say("Please sign in before submitting a task.");showPage("account");return;}
- const evidence="User tapped I've Completed It for: "+t.n+". This is a completion claim, not independent proof; verify before awarding points.";
- const {data,error}=await authClient.rpc("submit_creatorboost_task",{p_task_id:id,p_evidence:evidence});
+ const evidence=prompt("Add a public link or short description showing your completed work (3–2000 characters):");
+ if(evidence===null)return;
+ if(evidence.trim().length<3||evidence.trim().length>2000){say("Evidence must be between 3 and 2,000 characters.");return;}
+ const {error}=await authClient.rpc("submit_creatorboost_task",{p_task_id:id,p_evidence:evidence.trim()});
  if(error){say("Submission failed: "+error.message);return;}
- verifiedTaskState[id]="pending";let snapshot=JSON.parse(localStorage.getItem("cb_task_status_snapshot")||"{}");snapshot[id]="pending";localStorage.setItem("cb_task_status_snapshot",JSON.stringify(snapshot));showTasks();
- say("Completion claim submitted for review. No points are awarded unless completion is independently verified.");
+ verifiedTaskState[id]="pending";const snapshot=JSON.parse(localStorage.getItem("cb_task_status_snapshot")||"{}");snapshot[id]="pending";localStorage.setItem("cb_task_status_snapshot",JSON.stringify(snapshot));showTasks();
+ say("Completion claim submitted for review. Points are awarded only after independent verification.");
+}
+async function reviewTaskSubmission(id,approve){
+ if(!authClient)return;
+ const {data,error}=await authClient.rpc("review_creatorboost_task",{p_submission_id:id,p_approve:!!approve});
+ if(error){say("Task review failed: "+error.message);return;}
+ say(approve?"Task approved. "+Number(data||0)+" points awarded.":"Task submission rejected.");
+ await loadTaskReviewQueue();await loadPointsWallet();await loadTaskSubmissions();
 }
 document.getElementById("promotePlatforms").addEventListener("click",e=>{let b=e.target.closest("[data-promote-platform]");if(!b)return;promoteFilter=b.dataset.promotePlatform;const platformSelect=document.getElementById("campaignPlatform");if(platformSelect&&promoteFilter!=="All")platformSelect.value=promoteFilter;document.querySelectorAll("#promotePlatforms [data-promote-platform]").forEach(x=>x.classList.toggle("active",x===b));showCampaigns()});document.getElementById("campaignPlatform").addEventListener("change",e=>{promoteFilter=e.target.value;document.querySelectorAll("#promotePlatforms [data-promote-platform]").forEach(x=>x.classList.toggle("active",x.dataset.promotePlatform===promoteFilter));showCampaigns()});document.getElementById("earnPlatforms").addEventListener("click",e=>{let b=e.target.closest("[data-earn-platform]");if(!b)return;earnFilter=b.dataset.earnPlatform;document.querySelectorAll("#earnPlatforms .earn-app").forEach(x=>x.classList.toggle("active",x===b));showTasks()});document.getElementById("search").addEventListener("input",showCreators);document.getElementById("filters").addEventListener("click",e=>{let b=e.target.closest("[data-filter]");if(!b)return;filter=b.dataset.filter;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x===b));showCreators()});wallet();renderDailyTaskBonus();showCreators();showTasks();showCampaigns();renderStats();renderBuyerOrders();updateChecklist();loadTaskSubmissions();
 
