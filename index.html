@@ -344,7 +344,7 @@ button{max-width:100%;white-space:normal}
   <div class="cb-spin-layout">
    <div class="cb-wheel-stage"><div class="cb-wheel-pointer"></div>
     <div class="cb-wheel" id="cbSpinDisc" role="img" aria-label="Virtual mystery wheel with seven bad-luck sectors and three winning sectors">
-     <span class="cb-wheel-label" style="--a:18deg">BAD LUCK</span><span class="cb-wheel-label" style="--a:54deg">BAD LUCK</span><span class="cb-wheel-label" style="--a:90deg">BAD LUCK</span><span class="cb-wheel-label" style="--a:126deg">BAD LUCK</span><span class="cb-wheel-label" style="--a:162deg">BAD LUCK</span><span class="cb-wheel-label" style="--a:198deg">BAD LUCK</span><span class="cb-wheel-label" style="--a:234deg">BAD LUCK</span><span class="cb-wheel-label" style="--a:270deg">WIN</span><span class="cb-wheel-label" style="--a:306deg">WIN</span><span class="cb-wheel-label" style="--a:342deg">WIN</span>
+     <span class="cb-wheel-label" style="--a:18deg">-2x</span><span class="cb-wheel-label" style="--a:54deg">-2x</span><span class="cb-wheel-label" style="--a:90deg">-2x</span><span class="cb-wheel-label" style="--a:126deg">-2x</span><span class="cb-wheel-label" style="--a:162deg">-300</span><span class="cb-wheel-label" style="--a:198deg">-300</span><span class="cb-wheel-label" style="--a:234deg">-300</span><span class="cb-wheel-label" style="--a:270deg">2x</span><span class="cb-wheel-label" style="--a:306deg">+500</span><span class="cb-wheel-label" style="--a:342deg">5x</span>
      <div class="cb-wheel-hub">C</div>
     </div>
    </div>
@@ -754,9 +754,18 @@ showPage(new URLSearchParams(location.search).get("page")||"home",false);handleY
  const $=id=>document.getElementById(id);
  const validBid=()=>Number.isSafeInteger(Number(bidInput.value))&&Number(bidInput.value)>=1&&Number(bidInput.value)<=1000000;
  const fmt=n=>Number(n).toLocaleString("en-IN");
- const losingOutcomes=[{label:"-2x",delta:()=>-Number(bidInput.value)*2},{label:"-300",delta:()=>-300}];
- const winningOutcomes=[{label:"2x",delta:()=>Number(bidInput.value)*2},{label:"+500",delta:()=>500},{label:"+100",delta:()=>100},{label:"+1",delta:()=>1},{label:"5x",delta:()=>Number(bidInput.value)*5}];
- const sectorOutcomes=Array.from({length:10},(_,i)=>i<4?{kind:"loss",pick:()=>losingOutcomes[0]}:i<7?{kind:"loss",pick:()=>losingOutcomes[1]}:{kind:"win",pick:()=>winningOutcomes[Math.floor(Math.random()*winningOutcomes.length)]});
+ const sectorOutcomes=[
+  {kind:"loss",label:"-2x",delta:()=>-Number(bidInput.value)*2},
+  {kind:"loss",label:"-2x",delta:()=>-Number(bidInput.value)*2},
+  {kind:"loss",label:"-2x",delta:()=>-Number(bidInput.value)*2},
+  {kind:"loss",label:"-2x",delta:()=>-Number(bidInput.value)*2},
+  {kind:"loss",label:"-300",delta:()=>-300},
+  {kind:"loss",label:"-300",delta:()=>-300},
+  {kind:"loss",label:"-300",delta:()=>-300},
+  {kind:"win",label:"2x",delta:()=>Number(bidInput.value)*2},
+  {kind:"win",label:"+500",delta:()=>500},
+  {kind:"win",label:"5x",delta:()=>Number(bidInput.value)*5}
+ ];
  function save(){try{localStorage.setItem(storageKey,JSON.stringify({coins:data.coins,wins:data.wins,losses:data.losses,history:data.history}));}catch(e){}}
  function render(){
   $("cbSpinCoins").textContent=fmt(data.coins);$("cbSpinWins").textContent=data.wins;$("cbSpinLosses").textContent=data.losses;
@@ -771,7 +780,7 @@ showPage(new URLSearchParams(location.search).get("page")||"home",false);handleY
   data.rotation+=360*6+extra;disc.style.transform="rotate("+data.rotation+"deg)";
   window.setTimeout(()=>{
    data.busy=false;reset.disabled=false;bidInput.disabled=false;
-   const prize=sector.pick(),delta=prize.delta(),before=data.coins;data.coins=Math.max(0,data.coins+delta);const applied=data.coins-before;
+   const prize=sector,delta=prize.delta(),before=data.coins;data.coins=Math.max(0,data.coins+delta);const applied=data.coins-before;
    if(sector.kind==="win"){data.wins++;$("cbSpinHeadline").textContent="🎉 "+prize.label+" · +"+fmt(delta)+" credits";$("cbSpinMessage").textContent="You landed on a winning sector. Virtual credits added to your game score.";}
    else{data.losses++;$("cbSpinHeadline").textContent="🍀 Bad luck · "+prize.label+" · "+fmt(delta)+" credits";$("cbSpinMessage").textContent=applied===0?"Your virtual score is already zero; it cannot go below zero.":"Virtual arcade score adjusted only. Your real wallet is untouched.";}
    data.history.unshift({label:prize.label+" · "+(applied>0?"+":"")+fmt(applied)+" virtual credits (bid "+fmt(Number(bidInput.value))+")",time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})});data.history=data.history.slice(0,8);
