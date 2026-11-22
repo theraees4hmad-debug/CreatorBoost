@@ -453,7 +453,7 @@ button{max-width:100%;white-space:normal}
 
 <footer class="bottom"><span>© 2026 CreatorBoost · Grow together.</span><span>Points are awarded only for approved tasks and recorded wallet transactions. No social engagement is guaranteed.</span></footer>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
 // Add the Supabase Project URL and publishable anon key here after creating your project.
 const SUPABASE_URL = "https://yubjmudsbbgskeqqejob.supabase.co";
@@ -490,7 +490,7 @@ async function authAction(mode){
  finally{authBusy=false;buttons.forEach(b=>b.disabled=false);}
 }
 document.getElementById("authForm")?.addEventListener("submit",event=>{event.preventDefault();authAction(event.submitter?.dataset?.authMode||"login");});
-async function googleLogin(){if(!authClient){authMessage("Google login will be available after Supabase is connected and Google sign-in is enabled.");return;}const {error}=await authClient.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.origin+location.pathname,scopes:"openid email profile"}});if(error)authMessage(error.message);}
+async function googleLogin(){if(!authClient){authMessage("Secure login service is not ready. Refresh the page and try again.");return;}authMessage("Connecting to Google…");try{const {data,error}=await authClient.auth.signInWithOAuth({provider:"google",options:{redirectTo:"https://theraees4hmad-debug.github.io/CreatorBoost/",scopes:"openid email profile"}});if(error)authMessage("Google sign-in error: "+error.message);else if(data?.url)location.assign(data.url);}catch(e){authMessage("Google sign-in failed: "+(e?.message||"Please try again."));}}
 async function signOut(){if(!authClient){authMessage("Account setup is not connected yet.");return;}const {error}=await authClient.auth.signOut();authMessage(error?error.message:"You have logged out.");}
 async function resetPassword(){if(!authClient){authMessage("Password reset will work after the account connection is configured.");return;}const email=document.getElementById("authEmail").value.trim();if(!email){authMessage("Enter your email address first.");return;}const {error}=await authClient.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});authMessage(error?error.message:"Password reset email requested. Check your inbox.");}
 const creators=[{n:"Pixel Plays",h:"@pixelplays",p:"YouTube",e:"🎮",d:"Gaming highlights, walkthroughs and creator tips.",f:"12.4K"},{n:"Aisha Creates",h:"@aishacreates",p:"Instagram",e:"🎨",d:"Digital art, reels and behind-the-scenes creativity.",f:"8.2K"},{n:"MaverickLive",h:"@mavericklive",p:"Kick",e:"⚡",d:"Live gaming sessions and community hangouts.",f:"5.7K"},{n:"Tech with Arjun",h:"@techwitharjun",p:"YouTube",e:"💻",d:"Simple tech explainers, reviews and tutorials.",f:"21K"},{n:"Food Frames",h:"@foodframes",p:"Instagram",e:"🍜",d:"Quick recipes and food photography.",f:"16.8K"},{n:"Nova Streams",h:"@novastreams",p:"Kick",e:"🚀",d:"Competitive games, chats and live events.",f:"3.9K"}];
