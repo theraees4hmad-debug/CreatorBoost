@@ -790,12 +790,6 @@ document.getElementById("profilePromotionList")?.addEventListener("change",e=>{c
 async function showCampaigns(){
  const el=document.getElementById("campaignBoard");if(!el)return;
  if(!authClient){el.innerHTML='<div class="muted">Sign in to manage your campaigns.</div>';return;}
- const {data:{user:matchUser}}=await authClient.auth.getUser();
- const matchPrefs=matchUser?.user_metadata?.creatorboost_preferences||{};
- if(matchPrefs.category&&earnCategoryFilter==="All"){earnCategoryFilter=matchPrefs.category;const categorySelect=document.getElementById("earnCategoryFilter");if(categorySelect)categorySelect.value=earnCategoryFilter;}
- const {data:connectedRows}=await authClient.from("creator_profiles").select("platform").eq("user_id",matchUser?.id||"");
- earnConnectedPlatforms=[...new Set((connectedRows||[]).map(x=>String(x.platform||"")))].filter(Boolean);
- const connectedToggle=document.getElementById("earnOnlyConnected");if(connectedToggle){connectedToggle.checked=earnOnlyConnected;connectedToggle.disabled=!earnConnectedPlatforms.length;}
  const {data,error}=await authClient.rpc("my_creatorboost_campaigns_v2");if(error){el.innerHTML='<div class="muted">Campaigns unavailable. Please sign in and try again.</div>';return;}
  const mine=(data||[]).filter(x=>x.is_mine),seen=new Set(),a=mine.filter(x=>{const k=String(x.platform||"").toLowerCase()+"|"+String(x.url||"").replace(/\/$/,"").toLowerCase();if(seen.has(k))return false;seen.add(k);return true;}).filter(x=>promoteFilter==="All"||x.platform===promoteFilter);
  el.innerHTML=a.length?a.map((x,i)=>{
@@ -906,6 +900,12 @@ async function loadEarnCampaigns(){
  const {data:sessionData}=await authClient.auth.getSession();
  if(!sessionData?.session){box.innerHTML='<p class="small">Sign in to see live creator opportunities.</p><button class="btn" type="button" onclick="showPage(\'account\')">Sign in</button>';return;}
  box.innerHTML='<p class="small">Loading live promotions…</p>';
+ const {data:{user:matchUser}}=await authClient.auth.getUser();
+ const matchPrefs=matchUser?.user_metadata?.creatorboost_preferences||{};
+ if(matchPrefs.category&&earnCategoryFilter==="All"){earnCategoryFilter=matchPrefs.category;const categorySelect=document.getElementById("earnCategoryFilter");if(categorySelect)categorySelect.value=earnCategoryFilter;}
+ const {data:connectedRows}=await authClient.from("creator_profiles").select("platform").eq("user_id",matchUser?.id||"");
+ earnConnectedPlatforms=[...new Set((connectedRows||[]).map(x=>String(x.platform||"")))].filter(Boolean);
+ const connectedToggle=document.getElementById("earnOnlyConnected");if(connectedToggle){connectedToggle.checked=earnOnlyConnected;connectedToggle.disabled=!earnConnectedPlatforms.length;}
  const {data,error}=await authClient.rpc("my_creatorboost_campaigns_v2");
  if(error){box.innerHTML='<p class="small">Could not load live promotions. Please refresh.</p><button class="btn alt" type="button" onclick="loadEarnCampaigns()">Try again</button>';return;}
  const eligible=(data||[]).filter(x=>!x.is_mine&&x.status==="active"&&Number(x.remaining_budget||0)>=Number(x.reward_per_creator||0)&&(earnFilter==="All"||x.platform===earnFilter));
