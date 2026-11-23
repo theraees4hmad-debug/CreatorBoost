@@ -470,6 +470,10 @@ ice</button></article></div><div class="small">Prices are indicative starting qu
 <div id="earnCampaignList" class="tasks"><p class="small">Loading active campaigns…</p></div>
 <p class="small">Only active creator opportunities with enough budget are shown. Earn points for genuine, reviewable work and collaboration deliverables—not for following, liking or inflating metrics.</p>
 </div>
+<div class="panel" id="myCampaignSubmissionPanel" style="margin-top:14px">
+<div class="earn-column-title"><h3>My task verification</h3><button class="btn alt" type="button" onclick="loadMyCampaignSubmissions()">↻ Refresh</button></div>
+<div id="myCampaignSubmissionList" class="muted">Sign in to see your task submission history.</div>
+</div>
 <div class="panel" style="margin:0 0 16px;background:linear-gradient(135deg,#292052,#171c31)">
 <div class="eyebrow">HOW EARN & PROMOTE WORK TOGETHER</div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:12px">
@@ -795,7 +799,7 @@ async function submitCampaignWork(id){
  const {data,error}=await authClient.rpc("submit_creatorboost_campaign",{p_campaign_id:id,p_evidence:proof});
  if(error){say("Campaign submission failed: "+error.message);return;}
  say("Campaign work submitted. Points are paid only after admin approval.");
- await showCampaigns();
+ await loadMyCampaignSubmissions();await showCampaigns();
 }
 async function toggleCampaign(id){
  const {data,error}=await authClient.rpc("my_creatorboost_campaigns_v2");if(error){say(error.message);return;}
@@ -875,6 +879,7 @@ async function loadTaskSubmissions(){
  showTasks();
 }
 async function loadEarnCampaigns(){
+ loadMyCampaignSubmissions();
  const box=document.getElementById("earnCampaignList");if(!box)return;
  if(!authClient){box.innerHTML='<p class="small">Sign in to see active creator campaigns and submit work.</p><button class="btn" type="button" onclick="showPage(\'account\')">Sign in</button>';return;}
  const {data:sessionData}=await authClient.auth.getSession();
@@ -954,6 +959,22 @@ async function loadTaskReviewQueue(){
  box.innerHTML=(data||[]).length?(data||[]).map(x=>'<article class="creator"><b>'+safeText(x.title)+'</b><p class="small">Member: '+safeText(x.user_id)+' · '+new Date(x.submitted_at).toLocaleString()+'</p><p>'+safeText(x.evidence)+'</p><div class="actions"><button class="btn" onclick="reviewTaskSubmission(\''+x.id+'\',true)">Approve & award points</button><button class="btn alt" onclick="reviewTaskSubmission(\''+x.id+'\',false)">Reject</button></div></article>').join(""):'<p class="small">No pending submissions.</p>';
 }
 
+async function loadMyCampaignSubmissions(){
+ const box=document.getElementById("myCampaignSubmissionList");if(!box)return;
+ if(!authClient){box.textContent="Sign in to see your task submission history.";return;}
+ const {data:sessionData}=await authClient.auth.getSession();
+ if(!sessionData?.session){box.textContent="Sign in to see your task submission history.";return;}
+ box.innerHTML='<p class="small">Loading your submissions…</p>';
+ const {data,error}=await authClient.rpc("my_creatorboost_campaign_submissions");
+ if(error){box.textContent="Could not load your submission history: "+error.message;return;}
+ box.innerHTML=(data||[]).length?(data||[]).map(x=>{
+  const status=String(x.status||"pending");
+  const label=status==="approved"?"Approved · points awarded":status==="rejected"?"Rejected · review the note below":"Pending · awaiting verification";
+  const proof=String(x.evidence||"").trim();
+  const link=/^https?:\/\/\S+$/i.test(proof)?'<a class="text-link" href="'+safeText(proof)+'" target="_blank" rel="noopener noreferrer">Open submitted evidence ↗</a>':'';
+  return '<article class="creator"><b>'+safeText(x.campaign_title)+'</b><p class="small">'+label+' · '+new Date(x.submitted_at).toLocaleString()+'</p><p class="small">Reward: '+Number(x.reward_points||0)+' points'+(status==="approved"?' · Paid: '+Number(x.paid_points||0)+' points':'')+'</p>'+link+(x.reviewer_note?'<div class="panel" style="padding:10px"><b>Reviewer note</b><p class="small">'+safeText(x.reviewer_note)+'</p></div>':'')+'</article>';
+ }).join(""):'<p class="small">You have not submitted any campaign work yet.</p>';
+}
 async function loadCampaignReviewQueue(){
  const box=document.getElementById("campaignReviewList");if(!box)return;
  if(!authClient){box.textContent="Sign in with an authorized reviewer account to view submissions.";return;}
@@ -973,7 +994,7 @@ async function reviewCampaignSubmission(id,approve){
  const {data,error}=await authClient.rpc("review_creatorboost_campaign_submission_v2",{p_submission_id:id,p_approve:!!approve,p_reviewer_note:note});
  if(error){say("Campaign review failed: "+error.message);return;}
  say(approve?"Campaign approved. "+Number(data||0)+" points paid to the creator.":"Campaign submission rejected; reserved points returned to the campaign.");
- await loadCampaignReviewQueue();await loadPointsWallet();showCampaigns();
+ await loadCampaignReviewQueue();await loadPointsWallet();await loadMyCampaignSubmissions();showCampaigns();
 }
 async function submitCampaignWork(id){
  if(!authClient){say("Please sign in before submitting campaign work.");showPage("account");return;}
