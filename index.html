@@ -1056,6 +1056,24 @@ async function initCreatorChat(){
  await loadChatConversations();
 }
 
+document.getElementById("creatorList")?.addEventListener("click",async e=>{
+ const button=e.target.closest("[data-message-creator]");if(!button)return;
+ if(!authClient){say("Please sign in to message creators.");showPage("account");return;}
+ const {data:{user}}=await authClient.auth.getUser();
+ if(!user){say("Please sign in to message creators.");showPage("account");return;}
+ const recipient=button.dataset.messageCreator,name=button.dataset.messageName||"Creator";
+ if(recipient===user.id){say("This is your own creator profile.");return;}
+ button.disabled=true;
+ try{
+  showPage("chat");
+  const {data,error}=await authClient.rpc("cb_chat_start",{p_recipient:recipient});
+  if(error)throw error;
+  await loadChatConversations();
+  await openCreatorChat(data,recipient,name);
+ }catch(err){document.getElementById("chatNotice").textContent=err.message||"Could not start this conversation.";}
+ finally{button.disabled=false;}
+});
+
 function showPage(page,addHistory=true){
  if(page==="user")page="profile";if(page==="stats")page="dashboard";
  const allowed=["home","dashboard","stats","earn","promote","buyers","wallet","discover","profile","user","account","chat","admin"];
