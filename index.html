@@ -1412,6 +1412,70 @@ table{display:block;width:100%;overflow-x:auto}
  .creator:hover,.task:hover,.stat:hover,.btn:hover{transform:none}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* CreatorBoost responsive repair v3: real narrow-device layouts and form sizing */
+#profileSocialSearch{width:100%;min-width:0;grid-template-columns:minmax(0,1fr) minmax(150px,.7fr) auto}
+#profileSocialSearch>label{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;width:100%}
+#profileSocialSearch .search{display:block;width:100%;min-width:0;max-width:100%}
+#profileSocialSearch button{min-width:0;max-width:100%;white-space:normal}
+#profileWorkspace,#profileForm,#profileSocialSearch,#walletActions,#campaigns,#earn,#chatPage{min-width:0;max-width:100%}
+.mobile-nav{padding-bottom:max(7px,env(safe-area-inset-bottom))}
+@media(max-width:760px){
+ body{padding-bottom:calc(112px + env(safe-area-inset-bottom))!important}
+ main.wrap{padding-bottom:calc(36px + env(safe-area-inset-bottom))}
+ #profileSocialSearch{grid-template-columns:minmax(0,1fr)!important;align-items:stretch}
+ #profileSocialSearch>*{grid-column:1!important;width:100%;min-width:0}
+ #profileSocialSearch button{width:100%;min-height:48px}
+ #profileSocialSearchStatus{overflow-wrap:anywhere}
+ .top{min-height:64px}
+ .hero{grid-template-columns:minmax(0,1fr)!important}
+ .hero>*{min-width:0}
+ #walletActions>.panel{max-width:none!important}
+ #walletActions .head{align-items:flex-start}
+ #walletActions .head>div{min-width:0}
+ #walletActions .wallet-payment-heading{align-items:flex-start;flex-wrap:wrap}
+ #walletActions .wallet-payment-logos{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #campaignBoard{grid-template-columns:minmax(0,1fr)!important}
+ #campaignBoard>.creator{width:100%;min-width:0}
+ #chatPage .chat-layout{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(min-width:761px) and (max-width:1100px){
+ .wrap{max-width:100%;padding-inline:22px}
+ .nav{gap:2px}
+ .nav a{padding-inline:6px;font-size:12px}
+ .hero{grid-template-columns:minmax(0,1fr) minmax(230px,.8fr);gap:20px}
+ #campaignBoard{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #profileSocialSearch{grid-template-columns:minmax(0,1fr) minmax(0,.85fr)}
+ #profileSocialSearch button{grid-column:1/-1;width:100%}
+}
+@media(max-device-width:760px){
+ /* Also handles Android Chrome's desktop-site / reduced-zoom viewport */
+ body{padding-bottom:calc(112px + env(safe-area-inset-bottom))!important}
+ .wrap{width:100%;max-width:100%;padding-left:14px;padding-right:14px}
+ .top{display:flex;flex-wrap:nowrap;gap:8px;padding:9px 14px}
+ .top .nav{display:none!important}
+ .brand{font-size:18px;white-space:nowrap}
+ .wallet{white-space:nowrap}
+ .mobile-nav{position:fixed;z-index:45;left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px;padding:6px;background:rgba(25,18,42,.98);border:1px solid #594477;border-radius:17px;backdrop-filter:blur(18px);box-shadow:0 12px 35px #0009}
+ .mobile-nav a,.mobile-nav button{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 1px;font-size:10px}
+ #profileSocialSearch{display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-items:stretch}
+ #profileSocialSearch>*{grid-column:1!important;width:100%;min-width:0}
+ #profileSocialSearch .search{width:100%;min-width:0}
+ #profileSocialSearch button{width:100%;min-height:48px}
+ .hero{grid-template-columns:minmax(0,1fr)!important;padding-top:28px}
+ .stats,.cards,.tasks{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #walletActions>.panel{max-width:none!important}
+ #campaignBoard{grid-template-columns:minmax(0,1fr)!important}
+ #campaignBoard>.creator{width:100%;min-width:0}
+ #chatPage .chat-layout{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(max-device-width:420px){
+ .stats,.cards,.tasks{grid-template-columns:minmax(0,1fr)}
+ #profileAccountFacts{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .wallet-payment-logos{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .mobile-nav a,.mobile-nav button,.mobile-nav span{font-size:9px}
+}
+
 </style>
 <script id="cb-navigation-cleanup-v2">
 (function(){
