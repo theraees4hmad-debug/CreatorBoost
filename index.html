@@ -1303,6 +1303,115 @@ main.wrap>section[hidden]{display:none!important}
 }
 @media(min-width:761px){.mobile-nav{display:none!important}}
 @media(max-width:680px){#universalSocialSearch{grid-template-columns:minmax(0,1fr)!important}#universalSocialSearch>*{grid-column:1!important}#universalSocialSearch button{width:100%}}
+
+/* Adaptive layouts: desktop, laptop, tablets, Android/iPhone, foldables and landscape */
+:root{--page-gutter:clamp(12px,2.5vw,32px);--content-max:1440px}
+html{width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{width:100%;min-width:320px;overflow-x:clip}
+.wrap{width:100%;max-width:var(--content-max);padding-left:var(--page-gutter);padding-right:var(--page-gutter)}
+main.wrap{padding-bottom:clamp(24px,4vw,52px)}
+section{min-width:0}
+section>*{min-width:0}
+img,video,iframe,svg,canvas{max-width:100%}
+button,a,input,select,textarea{touch-action:manipulation}
+input,select,textarea{min-width:0}
+.stats,.cards,.tasks{grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr))}
+.hero{grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr)}
+#profileWorkspace,#profileAccountFacts,.earn-columns,.chat-layout{min-width:0}
+#profileAccountFacts{grid-template-columns:repeat(auto-fit,minmax(min(100%,155px),1fr))}
+#profileSocialSearch{grid-template-columns:minmax(0,1fr) minmax(150px,.65fr) auto}
+#profileForm,#campaignForm,#walletActions>.panel{width:100%;max-width:100%}
+.cb-promo-controls{grid-template-columns:repeat(4,minmax(0,1fr))}
+.cb-promo-controls>label:first-child{grid-column:span 1}
+#chatPage .chat-layout{grid-template-columns:minmax(250px,.78fr) minmax(0,1.6fr)}
+#chatPage .chat-sidebar,#chatPage .chat-window{min-width:0}
+table{display:block;width:100%;overflow-x:auto}
+@media(min-width:1440px){
+ :root{--page-gutter:clamp(32px,5vw,72px)}
+ .wrap{max-width:1600px}
+ .hero{gap:clamp(36px,5vw,76px);padding-top:clamp(60px,6vw,92px)}
+ .cards,.tasks{grid-template-columns:repeat(4,minmax(0,1fr))}
+ #chatPage .chat-layout{grid-template-columns:minmax(320px,.72fr) minmax(0,1.8fr)}
+}
+@media(min-width:761px) and (max-width:1100px){
+ :root{--page-gutter:22px}
+ .top{gap:12px}
+ .nav{gap:3px}
+ .nav a{padding:8px 7px;font-size:12px}
+ .hero{grid-template-columns:minmax(0,1fr) minmax(250px,.85fr);gap:20px}
+ .stats,.cards,.tasks{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .earn-columns{grid-template-columns:minmax(0,1fr)}
+ #chatPage .chat-layout{grid-template-columns:minmax(220px,.75fr) minmax(0,1.25fr)}
+ #profileSocialSearch{grid-template-columns:minmax(0,1fr) minmax(130px,.7fr)}
+ #profileSocialSearch button{grid-column:1/-1;width:100%}
+ .cb-promo-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .cb-promo-controls button{grid-column:1/-1}
+}
+@media(max-width:760px){
+ :root{--page-gutter:clamp(12px,3.2vw,22px)}
+ .top{width:100%;gap:8px}
+ .top .nav{order:3;width:100%;max-width:100%;display:flex;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
+ .top .nav::-webkit-scrollbar{display:none}
+ .top .nav a{flex:0 0 auto}
+ .hero{grid-template-columns:minmax(0,1fr);padding-top:clamp(24px,6vw,42px)}
+ .hero>*{min-width:0}
+ .stats,.cards,.tasks{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .earn-columns{grid-template-columns:minmax(0,1fr)}
+ #profileSocialSearch{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ #profileSocialSearch button{grid-column:1/-1;width:100%}
+ #profileAccountFacts{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #chatPage .chat-layout{grid-template-columns:minmax(0,1fr);min-height:0}
+ #chatPage .chat-sidebar{min-height:0}
+ #chatPage .chat-window{min-height:clamp(430px,72dvh,680px)}
+ #chatPage .chat-messages{min-height:240px;max-height:none;flex:1}
+ .cb-promo-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .cb-promo-controls button{grid-column:1/-1;width:100%}
+ .mobile-nav{padding-bottom:max(5px,env(safe-area-inset-bottom))}
+}
+@media(max-width:540px){
+ .stats,.cards,.tasks{grid-template-columns:minmax(0,1fr)}
+ #walletActions .stats{grid-template-columns:minmax(0,1fr)!important}
+ #profileAccountFacts{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #profileSocialSearch{grid-template-columns:minmax(0,1fr)}
+ #profileSocialSearch button{grid-column:auto}
+ .wallet-payment-logos{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .payment-choices{grid-template-columns:minmax(0,1fr)}
+ .chat-search-row{display:grid;grid-template-columns:minmax(0,1fr)}
+ .chat-search-row>*{width:100%;min-width:0}
+ .chat-send-form{align-items:stretch}
+ .chat-send-form .btn{min-width:76px;padding-inline:10px}
+ .cb-promo-controls{grid-template-columns:minmax(0,1fr)}
+ .cb-promo-controls button{grid-column:auto}
+ .head{align-items:flex-start}
+ .head h2{font-size:clamp(21px,6vw,27px)}
+ .actions{width:100%}
+ .actions>.btn{min-width:0}
+}
+@media(max-width:380px){
+ :root{--page-gutter:10px}
+ .brand{font-size:16px}
+ .wallet{font-size:10px;padding:7px}
+ .mobile-nav{left:4px;right:4px;gap:0;padding:4px}
+ .mobile-nav a,.mobile-nav button{font-size:9px}
+ .mobile-nav span{font-size:9px}
+ #profileAccountFacts{grid-template-columns:minmax(0,1fr)}
+ .wallet-payment-footer{padding:10px}
+ .wallet-pay-item small{overflow-wrap:anywhere}
+ .chat-send-form{gap:5px;padding:8px}
+ .chat-send-form .btn{min-width:62px;font-size:12px}
+}
+@media(orientation:landscape) and (max-height:520px) and (max-width:900px){
+ body{padding-bottom:12px}
+ .mobile-nav{position:sticky;left:auto;right:auto;bottom:auto;margin:8px auto;max-width:680px}
+ #chatPage .chat-window{min-height:360px}
+ #chatPage .chat-messages{min-height:180px;max-height:45vh}
+ .hero{padding-top:18px}
+}
+@media(hover:none) and (pointer:coarse){
+ .btn,.chip,.payment-choice,.earn-app,.mobile-nav a{min-height:44px}
+ .creator:hover,.task:hover,.stat:hover,.btn:hover{transform:none}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
 </style>
 <script id="cb-navigation-cleanup-v2">
 (function(){
