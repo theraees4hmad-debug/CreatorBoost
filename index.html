@@ -884,7 +884,7 @@ async function loadEarnCampaigns(){
  box.innerHTML=rows.length?rows.slice(0,3).map((x,i)=>{
   const reward=Number(x.reward_per_creator||0),goal=String(x.title||"").split(" · ").slice(1).join(" · ")||"Creator promotion";
   return '<article class="task"><div class="reward">#'+(i+1)+' · FEATURED · '+reward.toLocaleString("en-IN")+' points per approved creator</div><h3>'+safeProfileText(x.platform||"Creator")+' · '+safeProfileText(goal)+'</h3><p>'+safeProfileText(x.title||"Active creator campaign")+'</p><div class="small">Available budget: '+Number(x.remaining_budget||0).toLocaleString("en-IN")+' points</div><a class="btn alt" style="display:inline-block;text-decoration:none" href="'+safeProfileText(x.url)+'" target="_blank" rel="noopener">Open campaign ↗</a><button class="btn" type="button" data-earn-campaign="'+safeProfileText(x.id)+'">Complete & submit evidence</button></article>';
- }).join(""):'<p class="small">No active campaigns are available for this platform right now.</p>';
+ }).join(""):'<div class="panel" style="grid-column:1/-1;text-align:center;padding:22px"><h3>No live creator opportunities yet</h3><p class="small">There are no active campaigns from other creators with enough points available right now. CreatorBoost does not show demo campaigns or invented tasks.</p><button class="btn" type="button" onclick="showPage(\'promote\')">Create a real promotion ↗</button></div>';
 }
 document.getElementById("earnCampaignList")?.addEventListener("click",e=>{const b=e.target.closest("[data-earn-campaign]");if(b)submitCampaignWork(b.dataset.earnCampaign);});
 function showTasks(){
