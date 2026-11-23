@@ -1113,51 +1113,73 @@ showPage(new URLSearchParams(location.search).get("page")||"home",false);handleY
  update();render();
 })();
 
-</script><style id="CB_HARD_PAGE_ROUTER_V1">main.wrap>section[hidden]{display:none!important}</style>
-<script id="CB_HARD_PAGE_ROUTER_V1">
+</script><style id="cb-navigation-cleanup-v2">
+main.wrap>section[hidden]{display:none!important}
+#pageIntro{display:flex;flex-direction:column;gap:4px;margin:20px auto 12px;padding:14px 18px;border:1px solid #443765;border-radius:15px;background:linear-gradient(120deg,#24183b,#171329);color:#f7f3ff}
+#pageIntro strong{font-size:18px;line-height:1.25}
+#pageIntro span{color:#c9bddf;font-size:12px}
+.top{position:sticky;top:0;z-index:35;backdrop-filter:blur(16px);background:rgba(18,13,31,.96);border-bottom:1px solid #35274c}
+.nav{align-items:center;gap:4px}
+.nav a{white-space:nowrap;padding:9px 11px;border-radius:10px;text-decoration:none;color:#d8cde9;font-size:13px}
+.nav a:hover,.nav a[aria-current=page]{background:#39265a;color:#fff}
+.mobile-nav{display:none}
+.nav-more-menu{position:fixed;z-index:50;right:12px;bottom:82px;min-width:210px;padding:8px;background:#1b1430;border:1px solid #594477;border-radius:15px;box-shadow:0 16px 42px #0009}
+.nav-more-menu[hidden]{display:none!important}
+.nav-more-menu a{display:block;padding:12px;color:#eee7fa;text-decoration:none;border-radius:9px}
+.nav-more-menu a:hover,.nav-more-menu a[aria-current=page]{background:#39265a;color:#fff}
+.nav-more-toggle{border:0;background:transparent;color:#e7def5}
+@media(max-width:760px){
+ body{padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+ .top{position:sticky;top:0;display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;padding:10px 14px;gap:10px}
+ .top .nav{display:none!important}
+ .brand{font-size:18px;white-space:nowrap}
+ .wallet{white-space:nowrap}
+ .mobile-nav{position:fixed;z-index:45;left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;padding:6px;background:rgba(25,18,42,.97);border:1px solid #594477;border-radius:17px;backdrop-filter:blur(18px);box-shadow:0 12px 35px #0009}
+ .mobile-nav a,.mobile-nav button{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 2px;border:0;border-radius:10px;background:transparent;color:#ded4ed;text-decoration:none;font:700 10px/1.15 system-ui;cursor:pointer}
+ .mobile-nav a[aria-current=page],.mobile-nav button[aria-expanded=true]{background:#49316f;color:#fff}
+ .mobile-nav span{white-space:nowrap}
+ .mobile-nav button{font-size:10px}
+ .nav-more-menu{bottom:calc(78px + env(safe-area-inset-bottom));right:12px}
+ #pageIntro{margin-top:14px;padding:12px 14px}
+ main.wrap>section{margin-top:24px}
+}
+@media(min-width:761px){.mobile-nav{display:none!important}}
+</style>
+<script id="cb-navigation-cleanup-v2">
 (function(){
- const groups={
-  home:[".hero","#getting-started","section.stats"],
-  dashboard:["#stats"],
-  earn:["#earn","#discover"],
-  promote:["#campaigns"],
-  wallet:["#walletActions"],
-  profile:["#join"],
-  chat:["#chatPage"],
-  account:["#account"],
-  buyers:["#buyers","#packages"],
-  discover:["#discover"],
-  admin:["#adminReviewPage"]
+ const pages={
+  home:{selectors:[".hero","#getting-started","section.stats:not(#stats)"],title:"Home",desc:"Your creator community at a glance."},
+  dashboard:{selectors:["#stats"],title:"Dashboard",desc:"Your points, activity and promotion overview."},
+  earn:{selectors:["#earn","#discover"],title:"Earn",desc:"Find real creator opportunities and discover members."},
+  discover:{selectors:["#discover"],title:"Discover creators",desc:"Find real creators and explore their public profiles."},
+  promote:{selectors:["#campaigns"],title:"Promote",desc:"Create and manage your creator promotions."},
+  wallet:{selectors:["#walletActions"],title:"Wallet",desc:"Manage your points, deposits and withdrawals."},
+  profile:{selectors:["#join"],title:"Profile",desc:"Manage your creator profile and connected accounts."},
+  chat:{selectors:["#chatPage"],title:"Messages",desc:"Private conversations with other creators."},
+  account:{selectors:["#account"],title:"Sign in",desc:"Access your CreatorBoost account."},
+  buyers:{selectors:["#buyers","#packages"],title:"Creator services",desc:"Browse and request genuine creative work."},
+  admin:{selectors:["#adminReviewPage"],title:"Admin",desc:"Review submitted work and requests."}
  };
- const labels={
-  home:["Home","Your creator growth starts here."],
-  dashboard:["Dashboard","Your points, activity and campaign overview."],
-  earn:["Earn points","Genuine creator-community opportunities."],
-  promote:["Promote","Feature your creator profile with points."],
-  wallet:["Wallet","Your points and transactions."],
-  profile:["Profile","Manage your creator identity and social profiles."],
-  chat:["Messages","Chat privately with other creators."],
-  account:["Account","Manage your CreatorBoost sign-in."],
-  buyers:["Services","Creator services marketplace."],
-  discover:["Discover","Find real creator profiles."],
-  admin:["Admin controls","Review submissions and payouts."]
- };
- function route(page,addHistory){
+ function route(page,push){
   if(page==="stats")page="dashboard";
   if(page==="user")page="profile";
-  if(!groups[page])page="home";
-  document.querySelectorAll("main.wrap>section").forEach(el=>{el.hidden=true;});
-  (groups[page]||groups.home).forEach(sel=>document.querySelectorAll(sel).forEach(el=>{el.hidden=false;}));
-  const intro=document.getElementById("pageIntro"),label=labels[page]||labels.home;
-  if(intro)intro.innerHTML="<strong>"+label[0]+"</strong><span>"+label[1]+"</span>";
-  document.querySelectorAll("[data-page]").forEach(a=>{
-   if(a.dataset.page===page)a.setAttribute("aria-current","page");
-   else a.removeAttribute("aria-current");
+  if(!pages[page])page="home";
+  document.querySelectorAll("main.wrap>section").forEach(section=>{section.hidden=true;});
+  pages[page].selectors.forEach(selector=>{
+   document.querySelectorAll(selector).forEach(section=>{section.hidden=false;});
   });
-  const menu=document.getElementById("navMoreMenu"),toggle=document.querySelector(".nav-more-toggle");
+  const intro=document.getElementById("pageIntro");
+  if(intro)intro.innerHTML="<strong>"+pages[page].title+"</strong><span>"+pages[page].desc+"</span>";
+  document.querySelectorAll("a[data-page]").forEach(link=>{
+   const active=link.dataset.page===page;
+   if(active)link.setAttribute("aria-current","page");
+   else link.removeAttribute("aria-current");
+  });
+  const menu=document.getElementById("navMoreMenu");
+  const toggle=document.querySelector(".nav-more-toggle");
   if(menu)menu.hidden=true;
   if(toggle)toggle.setAttribute("aria-expanded","false");
-  if(addHistory)history.pushState({page:page},"","?page="+encodeURIComponent(page));
+  if(push)history.pushState({page:page},"","?page="+encodeURIComponent(page));
   if(page==="chat"&&typeof initCreatorChat==="function")initCreatorChat();
   if(page==="earn"){
    if(typeof loadEarnCampaigns==="function")loadEarnCampaigns();
@@ -1170,12 +1192,27 @@ showPage(new URLSearchParams(location.search).get("page")||"home",false);handleY
   window.scrollTo({top:0,behavior:"instant"});
  }
  window.showPage=route;
- document.addEventListener("click",function(e){
-  const a=e.target&&e.target.closest?e.target.closest("a[data-page]"):null;
-  if(!a)return;
-  e.preventDefault();e.stopImmediatePropagation();
-  route(a.dataset.page,true);
+ document.addEventListener("click",function(event){
+  const link=event.target&&event.target.closest?event.target.closest("a[data-page]"):null;
+  if(!link)return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  route(link.dataset.page,true);
  },true);
+ const toggle=document.querySelector(".nav-more-toggle");
+ const menu=document.getElementById("navMoreMenu");
+ if(toggle&&menu){
+  toggle.addEventListener("click",function(){
+   const opening=menu.hidden;
+   menu.hidden=!opening;
+   toggle.setAttribute("aria-expanded",String(opening));
+  });
+  document.addEventListener("click",function(event){
+   if(!menu.hidden&&!menu.contains(event.target)&&!toggle.contains(event.target)){
+    menu.hidden=true;toggle.setAttribute("aria-expanded","false");
+   }
+  });
+ }
  window.addEventListener("popstate",function(){
   route(new URLSearchParams(location.search).get("page")||"home",false);
  });
