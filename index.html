@@ -790,7 +790,9 @@ async function submitCampaignWork(id){
  if(!authClient){say("Please sign in before submitting campaign work.");showPage("account");return;}
  const evidence=prompt("Paste the public link or describe your completed campaign work (admin will verify it):");
  if(evidence===null)return;
- const {data,error}=await authClient.rpc("submit_creatorboost_campaign",{p_campaign_id:id,p_evidence:evidence.trim()});
+ const proof=evidence.trim();
+ if(proof.length<8){say("Add a valid public evidence link or a clear description of the work you completed.");return;}
+ const {data,error}=await authClient.rpc("submit_creatorboost_campaign",{p_campaign_id:id,p_evidence:proof});
  if(error){say("Campaign submission failed: "+error.message);return;}
  say("Campaign work submitted. Points are paid only after admin approval.");
  await showCampaigns();
