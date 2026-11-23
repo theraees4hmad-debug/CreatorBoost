@@ -468,7 +468,7 @@ ice</button></article></div><div class="small">Prices are indicative starting qu
 <div class="head"><div><h2>Earn from creator demand</h2><p>Creators publish promotions on Promote. Those live promotions appear here for other creators to complete genuine work and submit evidence for review.</p></div></div>
 <div class="panel" id="earnCampaignBoard">
 <div class="earn-column-title"><div><h3>Featured opportunities</h3><span class="small">Best available rewards from other creators</span></div><button class="btn alt" type="button" onclick="loadEarnCampaigns()">↻ Refresh</button></div>
-<div id="earnCampaignList" class="tasks"><p class="small">Loading active campaigns…</p></div>
+<label class="small" for="earnCampaignSearch">Browse active campaigns</label><input class="search" id="earnCampaignSearch" type="search" placeholder="Search campaign name, platform or category…" autocomplete="off" style="margin:8px 0 12px" aria-label="Search active campaigns by name, platform or category"><div id="earnCampaignList" class="tasks"><p class="small">Loading active campaigns…</p></div>
 <p class="small">Only active creator opportunities with enough budget are shown. Earn points for genuine, reviewable work and collaboration deliverables—not for following, liking or inflating metrics.</p>
 </div>
 <div class="panel" id="myCampaignSubmissionPanel" style="margin-top:14px">
@@ -847,7 +847,7 @@ async function showCreators(){
  box.innerHTML=rows.length?rows.map(x=>'<article class="creator"><div class="creatorhead"><div class="face">'+platformIcon(x.platform)+'</div><div><h3>'+safeProfileText(x.display_name||x.username||'Creator')+'</h3><div class="handle">@'+safeProfileText(x.username||'creator')+'</div><span class="tag">'+safeProfileText(x.platform)+'</span></div></div><p>Real CreatorBoost member · Public profile</p><div class="foot"><a class="btn alt" style="text-decoration:none" href="'+safeProfileText(x.profile_url)+'" target="_blank" rel="noopener noreferrer">Open profile ↗</a><button class="btn" type="button" data-message-creator="'+safeProfileText(x.user_id)+'" data-message-name="'+safeProfileText(x.display_name||x.username||'Creator')+'">Message</button></div></article>').join(''):'<div class="muted">No public creator profiles yet. Add a social account in Profile to appear here.</div>';
 }
 
-let earnFilter="All",earnCategoryFilter="All",earnOnlyConnected=false,earnConnectedPlatforms=[],verifiedTaskState={};
+let earnFilter="All",earnCategoryFilter="All",earnOnlyConnected=false,earnConnectedPlatforms=[],earnCampaignSearch="",verifiedTaskState={};
 function localDayKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function renderDailyTaskBonus(){
  const day=localDayKey();let state=JSON.parse(localStorage.getItem("cb_daily_task_bonus")||"{}");
@@ -908,12 +908,13 @@ async function loadEarnCampaigns(){
  const connectedToggle=document.getElementById("earnOnlyConnected");if(connectedToggle){connectedToggle.checked=earnOnlyConnected;connectedToggle.disabled=!earnConnectedPlatforms.length;}
  const {data,error}=await authClient.rpc("my_creatorboost_campaigns_v2");
  if(error){box.innerHTML='<p class="small">Could not load live promotions. Please refresh.</p><button class="btn alt" type="button" onclick="loadEarnCampaigns()">Try again</button>';return;}
- const eligible=(data||[]).filter(x=>!x.is_mine&&x.status==="active"&&Number(x.remaining_budget||0)>=Number(x.reward_per_creator||0)&&(earnFilter==="All"||x.platform===earnFilter));
+ const campaignQuery=earnCampaignSearch.trim().toLowerCase();
+ const eligible=(data||[]).filter(x=>!x.is_mine&&x.status==="active"&&Number(x.remaining_budget||0)>=Number(x.reward_per_creator||0)&&(earnFilter==="All"||x.platform===earnFilter)&&(!campaignQuery||[x.title,x.platform,x.category,x.url].join(" ").toLowerCase().includes(campaignQuery)));
  const rows=eligible.filter(x=>!earnOnlyConnected||earnConnectedPlatforms.includes(x.platform)).sort((a,b)=>{
   const score=x=>((earnCategoryFilter!=="All"&&String(x.category||"General")===earnCategoryFilter)?3:0)+(earnConnectedPlatforms.includes(x.platform)?2:0);
   return score(b)-score(a)||Number(b.reward_per_creator||0)-Number(a.reward_per_creator||0)||Number(b.remaining_budget||0)-Number(a.remaining_budget||0)||new Date(b.created_at||0)-new Date(a.created_at||0);
  });
- box.innerHTML=rows.length?rows.slice(0,3).map((x,i)=>{
+ box.innerHTML=rows.length?rows.slice(0,campaignQuery?rows.length:3).map((x,i)=>{
   const reward=Math.max(0,Number(x.reward_per_creator||0)),budget=Math.max(0,Number(x.remaining_budget||0)),slots=reward>0?Math.floor(budget/reward):0,title=String(x.title||"Creator promotion"),categoryMatch=earnCategoryFilter!=="All"&&String(x.category||"General")===earnCategoryFilter,platformMatch=earnConnectedPlatforms.includes(x.platform),matchLabel=categoryMatch&&platformMatch?"BEST MATCH":categoryMatch?"CATEGORY MATCH":platformMatch?"YOUR PLATFORM":"OPEN OPPORTUNITY";
   let profileUrl="";try{const parsed=new URL(String(x.url||""));if(parsed.protocol==="https:"||parsed.protocol==="http:")profileUrl=parsed.href;}catch(e){}
   const profileLink=profileUrl?'<a class="btn alt" style="display:inline-block;text-decoration:none" href="'+safeProfileText(profileUrl)+'" data-earn-profile-link="'+safeProfileText(x.id)+'" target="_blank" rel="noopener noreferrer">View creator profile ↗</a>':'<span class="small">Creator profile link unavailable</span>';
@@ -923,6 +924,7 @@ async function loadEarnCampaigns(){
  loadMyCampaignSubmissions();
 }
 document.getElementById("earnCampaignList")?.addEventListener("click",e=>{const b=e.target.closest("[data-earn-campaign]");if(b)submitCampaignWork(b.dataset.earnCampaign);const a=e.target.closest("[data-earn-profile-link]");if(a&&a.dataset.earnProfileLink)authClient?.rpc("track_creatorboost_campaign_event",{p_campaign_id:a.dataset.earnProfileLink,p_event_type:"click"});});
+document.getElementById("earnCampaignSearch")?.addEventListener("input",e=>{earnCampaignSearch=e.target.value||"";loadEarnCampaigns();});
 document.getElementById("earnCategoryFilter")?.addEventListener("change",async e=>{earnCategoryFilter=e.target.value;if(authClient){const {data:{user}}=await authClient.auth.getUser();if(user){const previous=user.user_metadata||{};await authClient.auth.updateUser({data:{...previous,creatorboost_preferences:{...(previous.creatorboost_preferences||{}),category:earnCategoryFilter}}});}}loadEarnCampaigns();});
 document.getElementById("earnOnlyConnected")?.addEventListener("change",e=>{earnOnlyConnected=e.target.checked;loadEarnCampaigns();});
 function showTasks(){
