@@ -484,7 +484,7 @@ ice</button></article></div><div class="small">Prices are indicative starting qu
 </div>
 <button class="btn" type="button" onclick="showPage('promote')">Create or manage promotions ↗</button>
 </div>
-<div class="earn-app-heading"><b>Campaign demand</b><span class="small">Find relevant creator opportunities</span></div><label class="small" for="earnCategoryFilter">Creator category</label><select class="search" id="earnCategoryFilter" style="max-width:320px;margin:8px 0 14px"><option>All</option><option>Gaming</option><option>Education</option><option>Lifestyle</option><option>Music</option><option>Art & Design</option><option>Technology</option><option>Fitness</option><option>Business</option><option>General</option></select>
+<div class="earn-app-heading"><b>Campaign demand</b><span class="small">Opportunities ranked by your creator profile</span></div><label class="small" for="earnCategoryFilter">Your content category</label><select class="search" id="earnCategoryFilter" style="max-width:320px;margin:8px 0 8px"><option>All</option><option>Gaming</option><option>Education</option><option>Lifestyle</option><option>Music</option><option>Art & Design</option><option>Technology</option><option>Fitness</option><option>Business</option><option>General</option></select><label class="small" style="display:flex;align-items:center;gap:8px;margin:0 0 14px"><input type="checkbox" id="earnOnlyConnected" style="width:auto"> Only show campaigns on my connected platforms</label>
 <div class="earn-app-grid" id="earnPlatforms">
 <button class="earn-app active" data-earn-platform="All"><span class="app-logo app-all">✦</span><b>All apps</b></button>
 <button class="earn-app" data-earn-platform="YouTube"><span class="app-logo app-youtube">▶</span><b>YouTube</b></button>
@@ -790,6 +790,12 @@ document.getElementById("profilePromotionList")?.addEventListener("change",e=>{c
 async function showCampaigns(){
  const el=document.getElementById("campaignBoard");if(!el)return;
  if(!authClient){el.innerHTML='<div class="muted">Sign in to manage your campaigns.</div>';return;}
+ const {data:{user:matchUser}}=await authClient.auth.getUser();
+ const matchPrefs=matchUser?.user_metadata?.creatorboost_preferences||{};
+ if(matchPrefs.category&&earnCategoryFilter==="All"){earnCategoryFilter=matchPrefs.category;const categorySelect=document.getElementById("earnCategoryFilter");if(categorySelect)categorySelect.value=earnCategoryFilter;}
+ const {data:connectedRows}=await authClient.from("creator_profiles").select("platform").eq("user_id",matchUser?.id||"");
+ earnConnectedPlatforms=[...new Set((connectedRows||[]).map(x=>String(x.platform||"")))].filter(Boolean);
+ const connectedToggle=document.getElementById("earnOnlyConnected");if(connectedToggle){connectedToggle.checked=earnOnlyConnected;connectedToggle.disabled=!earnConnectedPlatforms.length;}
  const {data,error}=await authClient.rpc("my_creatorboost_campaigns_v2");if(error){el.innerHTML='<div class="muted">Campaigns unavailable. Please sign in and try again.</div>';return;}
  const mine=(data||[]).filter(x=>x.is_mine),seen=new Set(),a=mine.filter(x=>{const k=String(x.platform||"").toLowerCase()+"|"+String(x.url||"").replace(/\/$/,"").toLowerCase();if(seen.has(k))return false;seen.add(k);return true;}).filter(x=>promoteFilter==="All"||x.platform===promoteFilter);
  el.innerHTML=a.length?a.map((x,i)=>{
@@ -847,7 +853,7 @@ async function showCreators(){
  box.innerHTML=rows.length?rows.map(x=>'<article class="creator"><div class="creatorhead"><div class="face">'+platformIcon(x.platform)+'</div><div><h3>'+safeProfileText(x.display_name||x.username||'Creator')+'</h3><div class="handle">@'+safeProfileText(x.username||'creator')+'</div><span class="tag">'+safeProfileText(x.platform)+'</span></div></div><p>Real CreatorBoost member · Public profile</p><div class="foot"><a class="btn alt" style="text-decoration:none" href="'+safeProfileText(x.profile_url)+'" target="_blank" rel="noopener noreferrer">Open profile ↗</a><button class="btn" type="button" data-message-creator="'+safeProfileText(x.user_id)+'" data-message-name="'+safeProfileText(x.display_name||x.username||'Creator')+'">Message</button></div></article>').join(''):'<div class="muted">No public creator profiles yet. Add a social account in Profile to appear here.</div>';
 }
 
-let earnFilter="All",earnCategoryFilter="All",verifiedTaskState={};
+let earnFilter="All",earnCategoryFilter="All",earnOnlyConnected=false,earnConnectedPlatforms=[],verifiedTaskState={};
 function localDayKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function renderDailyTaskBonus(){
  const day=localDayKey();let state=JSON.parse(localStorage.getItem("cb_daily_task_bonus")||"{}");
@@ -902,18 +908,23 @@ async function loadEarnCampaigns(){
  box.innerHTML='<p class="small">Loading live promotions…</p>';
  const {data,error}=await authClient.rpc("my_creatorboost_campaigns_v2");
  if(error){box.innerHTML='<p class="small">Could not load live promotions. Please refresh.</p><button class="btn alt" type="button" onclick="loadEarnCampaigns()">Try again</button>';return;}
- const rows=(data||[]).filter(x=>!x.is_mine&&x.status==="active"&&Number(x.remaining_budget||0)>=Number(x.reward_per_creator||0)&&(earnFilter==="All"||x.platform===earnFilter)&&(earnCategoryFilter==="All"||String(x.category||"General")===earnCategoryFilter)).sort((a,b)=>Number(b.reward_per_creator||0)-Number(a.reward_per_creator||0)||Number(b.remaining_budget||0)-Number(a.remaining_budget||0)||new Date(b.created_at||0)-new Date(a.created_at||0));
+ const eligible=(data||[]).filter(x=>!x.is_mine&&x.status==="active"&&Number(x.remaining_budget||0)>=Number(x.reward_per_creator||0)&&(earnFilter==="All"||x.platform===earnFilter));
+ const rows=eligible.filter(x=>!earnOnlyConnected||earnConnectedPlatforms.includes(x.platform)).sort((a,b)=>{
+  const score=x=>((earnCategoryFilter!=="All"&&String(x.category||"General")===earnCategoryFilter)?3:0)+(earnConnectedPlatforms.includes(x.platform)?2:0);
+  return score(b)-score(a)||Number(b.reward_per_creator||0)-Number(a.reward_per_creator||0)||Number(b.remaining_budget||0)-Number(a.remaining_budget||0)||new Date(b.created_at||0)-new Date(a.created_at||0);
+ });
  box.innerHTML=rows.length?rows.slice(0,3).map((x,i)=>{
-  const reward=Math.max(0,Number(x.reward_per_creator||0)),budget=Math.max(0,Number(x.remaining_budget||0)),slots=reward>0?Math.floor(budget/reward):0,title=String(x.title||"Creator promotion");
+  const reward=Math.max(0,Number(x.reward_per_creator||0)),budget=Math.max(0,Number(x.remaining_budget||0)),slots=reward>0?Math.floor(budget/reward):0,title=String(x.title||"Creator promotion"),categoryMatch=earnCategoryFilter!=="All"&&String(x.category||"General")===earnCategoryFilter,platformMatch=earnConnectedPlatforms.includes(x.platform),matchLabel=categoryMatch&&platformMatch?"BEST MATCH":categoryMatch?"CATEGORY MATCH":platformMatch?"YOUR PLATFORM":"OPEN OPPORTUNITY";
   let profileUrl="";try{const parsed=new URL(String(x.url||""));if(parsed.protocol==="https:"||parsed.protocol==="http:")profileUrl=parsed.href;}catch(e){}
   const profileLink=profileUrl?'<a class="btn alt" style="display:inline-block;text-decoration:none" href="'+safeProfileText(profileUrl)+'" data-earn-profile-link="'+safeProfileText(x.id)+'" target="_blank" rel="noopener noreferrer">View creator profile ↗</a>':'<span class="small">Creator profile link unavailable</span>';
-  return '<article class="task featured-opportunity"><div class="featured-topline"><span class="featured-rank">FEATURED #'+(i+1)+'</span><span class="tag">'+safeProfileText(x.platform||"Social")+' · '+safeProfileText(x.category||"General")+'</span></div><div class="eyebrow">CREATOR PROMOTION</div><h3>'+safeProfileText(title)+'</h3><div class="featured-reward">'+reward.toLocaleString("en-IN")+' points <span class="small">per approved creator</span></div><div class="featured-stats"><div><b>'+budget.toLocaleString("en-IN")+'</b><span>Points remaining</span></div><div><b>'+slots+'</b><span>Available reward slots</span></div></div><p class="small">Complete genuine, relevant creator work and submit evidence. Points are awarded only after review and approval.</p><div class="actions" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">'+profileLink+'<button class="btn" type="button" data-earn-campaign="'+safeProfileText(x.id)+'">Submit work for review</button></div></article>';
+  return '<article class="task featured-opportunity"><div class="featured-topline"><span class="featured-rank">FEATURED #'+(i+1)+'</span><span class="tag">'+safeProfileText(x.platform||"Social")+' · '+safeProfileText(x.category||"General")+'</span></div><div class="eyebrow">'+matchLabel+'</div><h3>'+safeProfileText(title)+'</h3><div class="featured-reward">'+reward.toLocaleString("en-IN")+' points <span class="small">per approved creator</span></div><div class="featured-stats"><div><b>'+budget.toLocaleString("en-IN")+'</b><span>Points remaining</span></div><div><b>'+slots+'</b><span>Available reward slots</span></div></div><p class="small">Complete genuine, relevant creator work and submit evidence. Points are awarded only after review and approval.</p><div class="actions" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">'+profileLink+'<button class="btn" type="button" data-earn-campaign="'+safeProfileText(x.id)+'">Submit work for review</button></div></article>';
  }).join(""):'<div class="panel" style="grid-column:1/-1;text-align:center;padding:22px"><h3>No live promotions yet</h3><p class="small">Active promotions from other creators will appear here when their remaining budget can cover at least one reward. There are no demo campaigns.</p><button class="btn" type="button" onclick="showPage(\'promote\')">Create a promotion ↗</button></div>';
  rows.slice(0,3).forEach(x=>authClient.rpc("track_creatorboost_campaign_event",{p_campaign_id:x.id,p_event_type:"impression"}).catch(()=>{}));
  loadMyCampaignSubmissions();
 }
 document.getElementById("earnCampaignList")?.addEventListener("click",e=>{const b=e.target.closest("[data-earn-campaign]");if(b)submitCampaignWork(b.dataset.earnCampaign);const a=e.target.closest("[data-earn-profile-link]");if(a&&a.dataset.earnProfileLink)authClient?.rpc("track_creatorboost_campaign_event",{p_campaign_id:a.dataset.earnProfileLink,p_event_type:"click"});});
-document.getElementById("earnCategoryFilter")?.addEventListener("change",e=>{earnCategoryFilter=e.target.value;loadEarnCampaigns();});
+document.getElementById("earnCategoryFilter")?.addEventListener("change",async e=>{earnCategoryFilter=e.target.value;if(authClient){const {data:{user}}=await authClient.auth.getUser();if(user){const previous=user.user_metadata||{};await authClient.auth.updateUser({data:{...previous,creatorboost_preferences:{...(previous.creatorboost_preferences||{}),category:earnCategoryFilter}}});}}loadEarnCampaigns();});
+document.getElementById("earnOnlyConnected")?.addEventListener("change",e=>{earnOnlyConnected=e.target.checked;loadEarnCampaigns();});
 function showTasks(){
  let list=tasks.filter(t=>earnFilter==="All"||t.p==="All"||t.p===earnFilter);
  const taskBox=document.getElementById("taskList");if(!taskBox)return;if(!list.length){taskBox.innerHTML='<p class="small">No genuine tasks are available right now. Check promoted campaigns for real creator opportunities.</p>';return;}taskBox.innerHTML=list.map(t=>{
