@@ -957,15 +957,22 @@ async function loadTaskReviewQueue(){
 async function loadCampaignReviewQueue(){
  const box=document.getElementById("campaignReviewList");if(!box)return;
  if(!authClient){box.textContent="Sign in with an authorized reviewer account to view submissions.";return;}
- const {data,error}=await authClient.rpc("admin_creatorboost_pending_campaign_submissions");
+ box.innerHTML='<p class="small">Loading evidence for review…</p>';
+ const {data,error}=await authClient.rpc("admin_creatorboost_pending_campaign_submissions_v2");
  if(error){box.textContent="Could not load campaign submissions: "+error.message;return;}
- box.innerHTML=(data||[]).length?(data||[]).map(x=>'<article class="creator"><b>'+safeText(x.campaign_title)+'</b><p class="small">Creator: '+safeText(x.user_id)+' · '+new Date(x.submitted_at).toLocaleString()+'</p><p>'+safeText(x.evidence)+'</p><p class="small">Reward: '+Number(x.reward_points)+' points · Campaign remaining: '+Number(x.remaining_budget)+' points</p><div class="actions"><button class="btn" type="button" onclick="reviewCampaignSubmission(this.dataset.id,true)" data-id="'+safeText(x.id)+'">Approve & pay points</button><button class="btn alt" type="button" onclick="reviewCampaignSubmission(this.dataset.id,false)" data-id="'+safeText(x.id)+'">Reject</button></div></article>').join(""):'<p class="small">No pending campaign submissions.</p>';
+ box.innerHTML=(data||[]).length?(data||[]).map(x=>{
+  const proof=String(x.evidence||"").trim();
+  const link=/^https?:\/\/\S+$/i.test(proof)?'<a class="btn alt" style="display:inline-block;text-decoration:none" href="'+safeText(proof)+'" target="_blank" rel="noopener noreferrer">Open evidence ↗</a>':'';
+  const duplicate=Number(x.duplicate_count||0);
+  return '<article class="creator"><b>'+safeText(x.campaign_title)+'</b><p class="small">Creator ID: '+safeText(x.user_id)+' · Submitted: '+new Date(x.submitted_at).toLocaleString()+'</p><div class="panel" style="padding:12px;margin:8px 0"><b>Submitted evidence</b><p style="white-space:pre-wrap;overflow-wrap:anywhere">'+safeText(proof)+'</p>'+link+'</div>'+(duplicate?'<p class="small" style="color:#ffbd76">⚠ Possible duplicate evidence: same proof appears in '+duplicate+' other submission(s) for this campaign. Check before approving.</p>':'<p class="small">No exact duplicate evidence found for this campaign.</p>')+'<p class="small">Reward: '+Number(x.reward_points)+' points · Campaign remaining: '+Number(x.remaining_budget)+' points</p><label class="small" for="campaignReviewNote-'+safeText(x.id)+'">Reviewer note (optional, max 1,000 characters)</label><textarea class="search" id="campaignReviewNote-'+safeText(x.id)+'" maxlength="1000" rows="2" placeholder="Reason for approval or what needs correction"></textarea><div class="actions"><button class="btn" type="button" onclick="reviewCampaignSubmission(this.dataset.id,true)" data-id="'+safeText(x.id)+'">Approve & pay points</button><button class="btn alt" type="button" onclick="reviewCampaignSubmission(this.dataset.id,false)" data-id="'+safeText(x.id)+'">Reject</button></div></article>';
+ }).join(""):'<p class="small">No pending campaign submissions.</p>';
 }
 async function reviewCampaignSubmission(id,approve){
  if(!authClient)return;
- const {data,error}=await authClient.rpc("review_creatorboost_campaign_submission",{p_submission_id:id,p_approve:!!approve});
+ const note=document.getElementById("campaignReviewNote-"+id)?.value?.trim()||null;
+ const {data,error}=await authClient.rpc("review_creatorboost_campaign_submission_v2",{p_submission_id:id,p_approve:!!approve,p_reviewer_note:note});
  if(error){say("Campaign review failed: "+error.message);return;}
- say(approve?"Campaign approved. "+Number(data||0)+" points paid to the creator.":"Campaign submission rejected.");
+ say(approve?"Campaign approved. "+Number(data||0)+" points paid to the creator.":"Campaign submission rejected; reserved points returned to the campaign.");
  await loadCampaignReviewQueue();await loadPointsWallet();showCampaigns();
 }
 async function submitCampaignWork(id){
