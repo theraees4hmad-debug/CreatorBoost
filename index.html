@@ -515,7 +515,7 @@ html{scroll-behavior:smooth}body{background-color:var(--bg);background-image:rad
 <h3 style="margin:0">Social media connector</h3>
 <p class="small">Find your real public creator profile, preview the result, then add it to your CreatorBoost profile. No platform authorization is required.</p>
 <div class="panel" id="profileSocialSearch" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,190px) auto;gap:10px;align-items:end">
-<label class="small" style="display:grid;gap:6px">Search creators or content<input class="search" id="profileSocialSearchQuery" type="search" placeholder="Creator name, @username, keyword or profile URL" autocomplete="off"></label>
+<label class="small" style="display:grid;gap:6px">Search creators or content<input class="search" id="profileSocialSearchQuery" type="search" placeholder="Creator name, @username or URL" autocomplete="off"></label>
 <label class="small" style="display:grid;gap:6px">Platform<select class="search" id="profileSocialSearchPlatform"><option value="All">All platforms</option><option>YouTube</option><option>Instagram</option><option>TikTok</option><option>Facebook</option><option>X</option><option>Snapchat</option><option>Twitch</option><option>Kick</option><option>Threads</option><option>Pinterest</option><option>LinkedIn</option><option>Reddit</option></select></label>
 <button class="btn" type="button" id="profileSocialSearchButton" onclick="window.runProfileSocialSearch?.()">Search accounts</button>
 <div class="small" id="profileSocialSearchStatus" aria-live="polite" style="grid-column:1/-1">Search public creator profiles and content across supported platforms. Enter a name, @username, keyword or profile URL.</div></div>
