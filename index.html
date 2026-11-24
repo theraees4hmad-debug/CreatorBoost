@@ -515,10 +515,10 @@ html{scroll-behavior:smooth}body{background-color:var(--bg);background-image:rad
 <h3 style="margin:0">Social media connector</h3>
 <p class="small">Find your real public creator profile, preview the result, then add it to your CreatorBoost profile. No platform authorization is required.</p>
 <div class="panel" id="profileSocialSearch" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,190px) auto;gap:10px;align-items:end">
-<label class="small" style="display:grid;gap:6px">Search creators or content<input class="search" id="profileSocialSearchQuery" type="search" placeholder="Creator name, @username or keyword" autocomplete="off"></label>
+<label class="small" style="display:grid;gap:6px">Search creators or content<input class="search" id="profileSocialSearchQuery" type="search" placeholder="Creator name, @username, keyword or profile URL" autocomplete="off"></label>
 <label class="small" style="display:grid;gap:6px">Platform<select class="search" id="profileSocialSearchPlatform"><option value="All">All platforms</option><option>YouTube</option><option>Instagram</option><option>TikTok</option><option>Facebook</option><option>X</option><option>Snapchat</option><option>Twitch</option><option>Kick</option><option>Threads</option><option>Pinterest</option><option>LinkedIn</option><option>Reddit</option></select></label>
 <button class="btn" type="button" id="profileSocialSearchButton" onclick="window.runProfileSocialSearch?.()">Search accounts</button>
-<div class="small" id="profileSocialSearchStatus" aria-live="polite" style="grid-column:1/-1">TikTok, Instagram and Facebook use direct public-profile lookup. Enter an exact @username or profile URL. Other platforms use public web search.</div></div>
+<div class="small" id="profileSocialSearchStatus" aria-live="polite" style="grid-column:1/-1">Search public creator profiles and content across supported platforms. Enter a name, @username, keyword or profile URL.</div></div>
 <div id="profileSocialSearchResults" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px"></div>
 <div class="social-connected-panel"><div class="social-connected-heading"><div><b>Connected accounts</b><div class="small">Your saved public profile links</div></div><span class="social-count" id="connectedSocialHint">Add your first account</span></div><div id="connectedSocialList" class="social-connected-list"><span class="small">No accounts connected yet.</span></div></div>
 <div class="small social-save-status" id="socialProfileStatus" aria-live="polite">Connections save to your CreatorBoost profile.</div>
@@ -1132,53 +1132,39 @@ async function reviewTaskSubmission(id,approve){
 document.getElementById("promotePlatforms").addEventListener("click",e=>{let b=e.target.closest("[data-promote-platform]");if(!b)return;promoteFilter=b.dataset.promotePlatform;const platformSelect=document.getElementById("campaignPlatform");if(platformSelect&&promoteFilter!=="All")platformSelect.value=promoteFilter;document.querySelectorAll("#promotePlatforms [data-promote-platform]").forEach(x=>x.classList.toggle("active",x===b));showCampaigns()});document.getElementById("campaignPlatform").addEventListener("change",e=>{promoteFilter=e.target.value;document.querySelectorAll("#promotePlatforms [data-promote-platform]").forEach(x=>x.classList.toggle("active",x.dataset.promotePlatform===promoteFilter));showCampaigns()});document.getElementById("earnPlatforms").addEventListener("click",e=>{let b=e.target.closest("[data-earn-platform]");if(!b)return;earnFilter=b.dataset.earnPlatform;document.querySelectorAll("#earnPlatforms .earn-app").forEach(x=>x.classList.toggle("active",x===b));showTasks();loadEarnCampaigns()});
 async function runProfileSocialSearch(){
  const queryInput=document.getElementById("profileSocialSearchQuery"),q=queryInput?.value.trim(),platform=document.getElementById("profileSocialSearchPlatform")?.value||"All",status=document.getElementById("profileSocialSearchStatus"),results=document.getElementById("profileSocialSearchResults"),button=document.getElementById("profileSocialSearchButton");
- if(!q){queryInput?.focus();return;}
+ if(!q){queryInput?.focus();if(status)status.textContent="Enter a creator name, @username, keyword or profile URL.";return;}
  if(!authClient){if(status)status.textContent="Please sign in to search and save creator profiles.";return;}
  const {data:{session}}=await authClient.auth.getSession();if(!session){if(status)status.textContent="Sign in to search and add creator profiles.";return;}
- if(button){button.disabled=true;button.textContent="Searching…";}if(status)status.textContent="Searching public "+(platform==="All"?"social profiles":platform+" profiles")+"…";if(results)results.innerHTML="";
+ if(button){button.disabled=true;button.textContent="Searching…";}if(status)status.textContent="Searching public "+(platform==="All"?"profiles and content across all platforms":platform+" profiles and content")+"…";if(results)results.innerHTML="";
  try{
+  const supportedDomains={YouTube:["youtube.com","youtu.be"],Instagram:["instagram.com"],TikTok:["tiktok.com"],Facebook:["facebook.com","fb.com"],X:["x.com","twitter.com"],Snapchat:["snapchat.com"],Twitch:["twitch.tv"],Kick:["kick.com"],Threads:["threads.net"],Pinterest:["pinterest.com"],LinkedIn:["linkedin.com"],Reddit:["reddit.com"]};
+  const allowed=platform==="All"?Object.values(supportedDomains).flat():supportedDomains[platform]||[];
   let rows=[];
-  if(platform==="TikTok"){
-   const {data,error}=await authClient.functions.invoke("socialcrawl-tiktok-profile",{body:{handle:q}});
-   if(error)throw new Error(error.message||"TikTok profile lookup request failed.");
-   if(data?.error)throw new Error(data.error);
-   const p=data?.profile;
-   if(p){
-    const metric=(label,value)=>value===null||value===undefined||value===""?null:label+": "+(typeof value==="number"?value.toLocaleString():String(value));
-    const details=[p.bio,metric("Followers",p.followers),metric("Likes",p.likes),p.verified?"Verified account":null, data.credits_used!==null&&data.credits_used!==undefined?"Credits used: "+data.credits_used:null].filter(Boolean);
-    rows=[{title:p.display_name||p.username||"TikTok profile",url:p.url,content:details.join(" · "),username:p.username}];
-   }
-  }else if(platform==="Instagram"||platform==="Facebook"){
-   // Use plain fetch here to avoid extra SDK transport headers and retain error details.
-   const {data:{session:activeSession}}=await authClient.auth.getSession();
-   if(!activeSession?.access_token)throw new Error("Your session expired. Please sign in again.");
-   const response=await fetch(SUPABASE_URL+"/functions/v1/socialapis-public-profile",{
-    method:"POST",mode:"cors",cache:"no-store",
-    headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+activeSession.access_token},
-    body:JSON.stringify({platform,query:q})
-   });
-   const responseText=await response.text();
-   let data={};try{data=responseText?JSON.parse(responseText):{};}catch{}
-   if(!response.ok)throw new Error(data?.error||data?.message||("Profile lookup failed (HTTP "+response.status+"). "+responseText.slice(0,180)));
-   if(data?.error)throw new Error(data.error);
-   const p=data?.profile;
-   if(p){
-    const metric=(label,value)=>value===null||value===undefined||value===""?null:label+": "+(typeof value==="number"?value.toLocaleString():String(value));
-    const details=[p.bio,metric("Followers",p.followers),metric("Following",p.following),metric("Posts",p.posts),p.verified?"Verified account":null,data.credits_used!==null&&data.credits_used!==undefined?"Credits used: "+data.credits_used:null].filter(Boolean);
-    rows=[{title:p.display_name||p.username||platform+" profile",url:p.url,content:details.join(" · "),username:p.username}];
-   }
+  let directUrl="";
+  if(/^https?:\/\//i.test(q)){
+   try{const parsed=new URL(q);if(allowed.some(d=>parsed.hostname.toLowerCase()===d||parsed.hostname.toLowerCase().endsWith("."+d)))directUrl=parsed.href;}catch{}
+  }
+  if(directUrl){
+   rows=[{title:"Public social profile or content",url:directUrl,content:"Direct link supplied. Preview it before adding to your profile."}];
   }else{
-   const searchQuery=platform==="YouTube"?'site:youtube.com/@ OR site:youtube.com/channel OR site:youtube.com/c OR site:youtube.com/user '+q:q;
+   const searchQuery=(q.startsWith("@")?q+" creator profile":q)+" social media creator profile account content";
    const {data,error}=await authClient.functions.invoke("tavily-social-search",{body:{query:searchQuery,platform}});
-   if(error)throw new Error(error.message||"Search service request failed.");
+   if(error){let detail="";try{detail=await error.context?.clone?.text?.()||"";}catch{}throw new Error(detail||error.message||"Search service request failed.");}
    if(data?.error)throw new Error(data.error);
    rows=Array.isArray(data?.results)?data.results:[];
   }
-  const usable=rows.map(item=>{const url=/^https?:\/\//i.test(item.url||"")?item.url:"";if(!url)return null;let host="";try{host=new URL(url).hostname.toLowerCase();}catch{return null;}if(platform==="YouTube"){const path=new URL(url).pathname;if(!/(^|\.)youtube\.com$/.test(host)||!(/^\/@[^/]+/.test(path)||/^\/(channel|c|user)\/[^/]+/.test(path)))return null;}return {...item,url};}).filter(Boolean);
-  if(!usable.length){if(status)status.textContent=platform==="YouTube"?"No YouTube channel results found. Try the channel name or @handle.":"No matching public profiles found. Try another name or platform.";return;}
-  if(status)status.textContent=usable.length+" public results. Review each result and add the correct account.";
-  if(results)results.innerHTML=usable.map(item=>'<article class="task" style="display:grid;gap:8px;min-width:0;overflow-wrap:anywhere"><b>'+escapeSocialSearchHtml(item.title||"Creator profile")+'</b><span class="small">'+escapeSocialSearchHtml(item.content||"Public profile result")+'</span><a class="text-link" href="'+escapeSocialSearchHtml(item.url)+'" target="_blank" rel="noopener noreferrer">Preview '+escapeSocialSearchHtml(platform==="YouTube"?"YouTube channel":"profile")+' ↗</a><button class="btn" type="button" data-connect-found-social="1" data-social-url="'+encodeURIComponent(item.url)+'">＋ Add to profile</button></article>').join("");
- }catch(e){if(status)status.textContent="Creator search failed: "+(e?.message||"Please try again.")+". No external search page was opened.";}
+  const usable=rows.map(item=>{
+   const url=/^https?:\/\//i.test(item.url||"")?item.url:"";if(!url)return null;
+   let host="";try{host=new URL(url).hostname.toLowerCase();}catch{return null;}
+   const resultPlatform=Object.keys(supportedDomains).find(p=>supportedDomains[p].some(d=>host===d||host.endsWith("."+d)));
+   if(!resultPlatform||!allowed.some(d=>host===d||host.endsWith("."+d)))return null;
+   return {...item,url,platform:resultPlatform};
+  }).filter(Boolean);
+  const unique=Array.from(new Map(usable.map(item=>[item.url,item])).values()).slice(0,8);
+  if(!unique.length){if(status)status.textContent="No matching public profiles or content found. Try another name, @username or keyword.";return;}
+  if(status)status.textContent=unique.length+" public results. Preview the correct result, then select Add to profile.";
+  if(results)results.innerHTML=unique.map(item=>'<article class="task" style="display:grid;gap:8px;min-width:0;overflow-wrap:anywhere"><b>'+escapeSocialSearchHtml(item.title||"Creator profile or content")+'</b><span class="small">'+escapeSocialSearchHtml(item.platform+" · "+(item.content||"Public result"))+'</span><a class="text-link" href="'+escapeSocialSearchHtml(item.url)+'" target="_blank" rel="noopener noreferrer">Preview ↗</a><button class="btn" type="button" data-connect-found-social="1" data-social-url="'+encodeURIComponent(item.url)+'">＋ Add to profile</button></article>').join("");
+ }catch(e){if(status)status.textContent="Creator search failed: "+(e?.message||"Please try again.");}
  finally{if(button){button.disabled=false;button.textContent="Search accounts";}}
 }
 window.runProfileSocialSearch=runProfileSocialSearch;
