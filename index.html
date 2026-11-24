@@ -517,7 +517,7 @@ html{scroll-behavior:smooth}body{background-color:var(--bg);background-image:rad
 <div class="panel" id="profileSocialSearch" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,190px) auto;gap:10px;align-items:end">
 <label class="small" style="display:grid;gap:6px">Search creators or content<input class="search" id="profileSocialSearchQuery" type="search" placeholder="Creator name, @username or keyword" autocomplete="off"></label>
 <label class="small" style="display:grid;gap:6px">Platform<select class="search" id="profileSocialSearchPlatform"><option value="All">All platforms</option><option>YouTube</option><option>Instagram</option><option>TikTok</option><option>Facebook</option><option>X</option><option>Snapchat</option><option>Twitch</option><option>Kick</option><option>Threads</option><option>Pinterest</option><option>LinkedIn</option><option>Reddit</option></select></label>
-<button class="btn" type="button" id="profileSocialSearchButton">Search accounts</button>
+<button class="btn" type="button" id="profileSocialSearchButton" onclick="window.runProfileSocialSearch?.()">Search accounts</button>
 <div class="small" id="profileSocialSearchStatus" aria-live="polite" style="grid-column:1/-1">For TikTok, enter an exact @username or profile URL. Other platforms use public web search.</div></div>
 <div id="profileSocialSearchResults" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px"></div>
 <div class="social-connected-panel"><div class="social-connected-heading"><div><b>Connected accounts</b><div class="small">Your saved public profile links</div></div><span class="social-count" id="connectedSocialHint">Add your first account</span></div><div id="connectedSocialList" class="social-connected-list"><span class="small">No accounts connected yet.</span></div></div>
@@ -1162,7 +1162,7 @@ async function runProfileSocialSearch(){
  }catch(e){if(status)status.textContent="Creator search failed: "+(e?.message||"Please try again.")+". No external search page was opened.";}
  finally{if(button){button.disabled=false;button.textContent="Search accounts";}}
 }
-document.getElementById("profileSocialSearchButton")?.addEventListener("click",runProfileSocialSearch);
+window.runProfileSocialSearch=runProfileSocialSearch;
 document.getElementById("profileSocialSearchQuery")?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();runProfileSocialSearch();}});
 document.getElementById("profileSocialSearchResults")?.addEventListener("click",e=>{
  const button=e.target.closest("[data-connect-found-social]");if(!button)return;
