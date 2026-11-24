@@ -594,6 +594,8 @@ html{scroll-behavior:smooth}body{background-color:var(--bg);background-image:rad
 const SUPABASE_URL = "https://yubjmudsbbgskeqqejob.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_Bb3ky6zyibP7LS2dXVZNnA_UYNWezlr";
 let authClient = null;
+window.addEventListener("error",event=>{console.error("CreatorBoost runtime error:",event.error||event.message);const notice=document.getElementById("notice");if(notice){notice.textContent="A page feature encountered an error. Refresh the page; if it continues, contact support.";notice.style.display="block";}});
+window.addEventListener("unhandledrejection",event=>{console.error("CreatorBoost async error:",event.reason);const notice=document.getElementById("notice");if(notice){notice.textContent="A request failed. Please try again.";notice.style.display="block";}});
 try{if(!window.supabase){authMessage("Secure login library is unavailable. The page tried its backup source; refresh once or check your connection.");}else if(SUPABASE_URL.startsWith("https://")&&!SUPABASE_URL.includes("YOUR_")&&!SUPABASE_ANON_KEY.includes("YOUR_")){authClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});authMessage("Secure account connection ready. You can sign up or log in.");authClient.auth.getSession().then(({data,error})=>{if(error)authMessage(error.message);updateAuthUI(data?.session||null);}).catch(e=>authMessage("Connection error: "+(e?.message||"Please refresh the page.")));authClient.auth.onAuthStateChange((_event,session)=>{updateAuthUI(session);if(session){renderBuyerOrders();loadServiceOrderQueue();}});}else{authMessage("Account connection is not configured.");}}catch(e){authMessage("Account setup error: "+(e?.message||"Please refresh the page."));}
 function chooseBuyerPackage(platform,goal,budget){const p=document.getElementById("buyerPlatform"),g=document.getElementById("buyerGoal"),q=document.getElementById("buyerTarget");if(p)p.value=platform;if(g){const allowed=["Thumbnail design","Short-form video editing","Captions and subtitles","Channel content audit","Creator branding kit","Promotion strategy"];g.value=allowed.includes(goal)?goal:"Thumbnail design";}if(q)q.value="1";updateBuyerPrice();document.getElementById("buyers")?.scrollIntoView({behavior:"smooth"});say("Service selected. Add your project URL, details and payment reference.");}
 function chooseBuyerPayment(method){const sel=document.getElementById("buyerPaymentMethod"),panel=document.getElementById("buyerGatewayPanel");if(!sel)return;sel.value=method;sel.dispatchEvent(new Event("change"));if(panel&&method!=="CreatorBoost wallet")panel.scrollIntoView({behavior:"smooth",block:"nearest"});if(method==="CreatorBoost wallet")say("Wallet checkout selected. The server will check and deduct your points securely.");}
@@ -1171,7 +1173,9 @@ document.getElementById("profileSocialSearchResults")?.addEventListener("click",
 });
 
 function escapeSocialSearchHtml(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
-document.getElementById("search").addEventListener("input",showCreators);document.getElementById("filters").addEventListener("click",e=>{let b=e.target.closest("[data-filter]");if(!b)return;filter=b.dataset.filter;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x===b));showCreators()});wallet();renderDailyTaskBonus();showCreators();showTasks();showCampaigns();renderStats();renderBuyerOrders();updateChecklist();loadTaskSubmissions();
+document.getElementById("search")?.addEventListener("input",showCreators);document.getElementById("filters")?.addEventListener("click",e=>{let b=e.target.closest("[data-filter]");if(!b)return;filter=b.dataset.filter;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x===b));showCreators()});
+function runStartupStep(name,fn){try{const result=fn();if(result&&typeof result.catch==="function")result.catch(error=>console.error("CreatorBoost startup:",name,error));}catch(error){console.error("CreatorBoost startup:",name,error);}}
+[["wallet",wallet],["daily task bonus",renderDailyTaskBonus],["creator directory",showCreators],["tasks",showTasks],["campaigns",showCampaigns],["stats",renderStats],["buyer orders",renderBuyerOrders],["checklist",updateChecklist],["task submissions",loadTaskSubmissions]].forEach(([name,fn])=>runStartupStep(name,fn));
 
 
 
@@ -1250,35 +1254,8 @@ document.getElementById("creatorList")?.addEventListener("click",async e=>{
  finally{button.disabled=false;}
 });
 
-function showPage(page,addHistory=true){
- if(page==="user")page="profile";if(page==="stats")page="dashboard";
- const allowed=["home","dashboard","stats","earn","promote","wallet","discover","profile","user","account","chat","admin"];
- if(!allowed.includes(page))page="home";
- const groups={
-  stats:["#stats"],user:["#join"],
-  home:[".hero","section.stats"],
-  dashboard:["#stats"],
-  earn:["#earn"],
-  promote:["#campaigns"],
-  wallet:["#walletActions"],
-  discover:["#discover"],
-  profile:["#join"],
-  account:["#account"],
-  chat:["#chatPage"],admin:["#adminReviewPage"],
- };
- document.querySelectorAll("main.wrap>section").forEach(el=>el.hidden=true);
- groups[page].forEach(sel=>document.querySelectorAll(sel).forEach(el=>el.hidden=false));
- const labels={home:["Home","Your creator growth starts here."],stats:["Statistics","Your points, tasks, promotions and account activity."],user:["My profile","Your CreatorBoost identity and social accounts."],dashboard:["Dashboard","Your points, activity and campaign overview."],earn:["Earn points","Complete genuine creator-community activities."],promote:["Promote","Feature your creator profile with points."],wallet:["Wallet","Review deposit and withdrawal request forms."],discover:["Discover","Find creators and add your public profile."],profile:["Social media profile","Add and manage all your public social profile links in one place."],account:["Account","Manage your CreatorBoost sign-in."],chat:["Messages","Chat privately with other CreatorBoost creators."],admin:["Admin controls","Review task submissions and approve withdrawal payouts."]};
- const intro=document.getElementById("pageIntro");if(intro)intro.innerHTML="<strong>"+labels[page][0]+"</strong><span>"+labels[page][1]+"</span>";
- document.querySelectorAll("[data-page]").forEach(a=>{if(a.dataset.page===page)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
- if(addHistory)history.pushState({page},"","?page="+page);
- if(page==="chat")initCreatorChat();if(page==="earn"){loadEarnCampaigns();showCreators();}if(page==="promote"){showCampaigns();}
- window.scrollTo({top:0,behavior:"instant"});
-}
-window.addEventListener("popstate",()=>showPage(new URLSearchParams(location.search).get("page")||"home",false));
-document.querySelectorAll("[data-page]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();showPage(a.dataset.page);const menu=document.getElementById("navMoreMenu"),toggle=document.querySelector(".nav-more-toggle");if(menu)menu.hidden=true;if(toggle)toggle.setAttribute("aria-expanded","false");}));
-const moreToggle=document.querySelector(".nav-more-toggle"),moreMenu=document.getElementById("navMoreMenu");if(moreToggle&&moreMenu){moreToggle.addEventListener("click",()=>{const open=moreMenu.hidden;moreMenu.hidden=!open;moreToggle.setAttribute("aria-expanded",String(open));});document.addEventListener("click",e=>{if(!moreMenu.hidden&&!moreMenu.contains(e.target)&&!moreToggle.contains(e.target)){moreMenu.hidden=true;moreToggle.setAttribute("aria-expanded","false");}});}
-showPage(new URLSearchParams(location.search).get("page")||"home",false);handleYouTubeOAuthReturn();
+// Navigation is handled by the single router below.
+
 
 
 </script><style id="cb-navigation-cleanup-v2">
@@ -1487,7 +1464,7 @@ table{display:block;width:100%;overflow-x:auto}
 }
 
 </style>
-<script id="cb-navigation-cleanup-v2">
+<script id="cb-navigation-router-v3">
 (function(){
  const pages={
   home:{selectors:[".hero","#getting-started","section.stats:not(#stats)"],title:"Home",desc:"Your creator community at a glance."},
@@ -1559,5 +1536,6 @@ table{display:block;width:100%;overflow-x:auto}
   route(new URLSearchParams(location.search).get("page")||"home",false);
  });
  route(new URLSearchParams(location.search).get("page")||"home",false);
+ if(typeof handleYouTubeOAuthReturn==="function")handleYouTubeOAuthReturn();
 })();
 </script></body></html>
