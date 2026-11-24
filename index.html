@@ -1149,8 +1149,17 @@ async function runProfileSocialSearch(){
     rows=[{title:p.display_name||p.username||"TikTok profile",url:p.url,content:details.join(" · "),username:p.username}];
    }
   }else if(platform==="Instagram"||platform==="Facebook"){
-   const {data,error}=await authClient.functions.invoke("socialapis-public-profile",{body:{platform,query:q}});
-   if(error)throw new Error(error.message||platform+" profile lookup request failed.");
+   // Use plain fetch here to avoid extra SDK transport headers and retain error details.
+   const {data:{session:activeSession}}=await authClient.auth.getSession();
+   if(!activeSession?.access_token)throw new Error("Your session expired. Please sign in again.");
+   const response=await fetch(SUPABASE_URL+"/functions/v1/socialapis-public-profile",{
+    method:"POST",mode:"cors",cache:"no-store",
+    headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+activeSession.access_token},
+    body:JSON.stringify({platform,query:q})
+   });
+   const responseText=await response.text();
+   let data={};try{data=responseText?JSON.parse(responseText):{};}catch{}
+   if(!response.ok)throw new Error(data?.error||data?.message||("Profile lookup failed (HTTP "+response.status+"). "+responseText.slice(0,180)));
    if(data?.error)throw new Error(data.error);
    const p=data?.profile;
    if(p){
