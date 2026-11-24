@@ -518,7 +518,7 @@ html{scroll-behavior:smooth}body{background-color:var(--bg);background-image:rad
 <label class="small" style="display:grid;gap:6px">Search creators or content<input class="search" id="profileSocialSearchQuery" type="search" placeholder="Creator name, @username or keyword" autocomplete="off"></label>
 <label class="small" style="display:grid;gap:6px">Platform<select class="search" id="profileSocialSearchPlatform"><option value="All">All platforms</option><option>YouTube</option><option>Instagram</option><option>TikTok</option><option>Facebook</option><option>X</option><option>Snapchat</option><option>Twitch</option><option>Kick</option><option>Threads</option><option>Pinterest</option><option>LinkedIn</option><option>Reddit</option></select></label>
 <button class="btn" type="button" id="profileSocialSearchButton" onclick="window.runProfileSocialSearch?.()">Search accounts</button>
-<div class="small" id="profileSocialSearchStatus" aria-live="polite" style="grid-column:1/-1">For TikTok, enter an exact @username or profile URL. Other platforms use public web search.</div></div>
+<div class="small" id="profileSocialSearchStatus" aria-live="polite" style="grid-column:1/-1">TikTok, Instagram and Facebook use direct public-profile lookup. Enter an exact @username or profile URL. Other platforms use public web search.</div></div>
 <div id="profileSocialSearchResults" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px"></div>
 <div class="social-connected-panel"><div class="social-connected-heading"><div><b>Connected accounts</b><div class="small">Your saved public profile links</div></div><span class="social-count" id="connectedSocialHint">Add your first account</span></div><div id="connectedSocialList" class="social-connected-list"><span class="small">No accounts connected yet.</span></div></div>
 <div class="small social-save-status" id="socialProfileStatus" aria-live="polite">Connections save to your CreatorBoost profile.</div>
@@ -1147,6 +1147,16 @@ async function runProfileSocialSearch(){
     const metric=(label,value)=>value===null||value===undefined||value===""?null:label+": "+(typeof value==="number"?value.toLocaleString():String(value));
     const details=[p.bio,metric("Followers",p.followers),metric("Likes",p.likes),p.verified?"Verified account":null, data.credits_used!==null&&data.credits_used!==undefined?"Credits used: "+data.credits_used:null].filter(Boolean);
     rows=[{title:p.display_name||p.username||"TikTok profile",url:p.url,content:details.join(" · "),username:p.username}];
+   }
+  }else if(platform==="Instagram"||platform==="Facebook"){
+   const {data,error}=await authClient.functions.invoke("socialapis-public-profile",{body:{platform,query:q}});
+   if(error)throw new Error(error.message||platform+" profile lookup request failed.");
+   if(data?.error)throw new Error(data.error);
+   const p=data?.profile;
+   if(p){
+    const metric=(label,value)=>value===null||value===undefined||value===""?null:label+": "+(typeof value==="number"?value.toLocaleString():String(value));
+    const details=[p.bio,metric("Followers",p.followers),metric("Following",p.following),metric("Posts",p.posts),p.verified?"Verified account":null,data.credits_used!==null&&data.credits_used!==undefined?"Credits used: "+data.credits_used:null].filter(Boolean);
+    rows=[{title:p.display_name||p.username||platform+" profile",url:p.url,content:details.join(" · "),username:p.username}];
    }
   }else{
    const searchQuery=platform==="YouTube"?'site:youtube.com/@ OR site:youtube.com/channel OR site:youtube.com/c OR site:youtube.com/user '+q:q;
