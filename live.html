@@ -21,6 +21,26 @@ nav{display:flex;gap:18px}nav a{color:#d8cce9;text-decoration:none;font-size:13p
 .cb-share-fab{position:fixed;right:20px;bottom:20px;z-index:80;border:0;border-radius:999px;padding:13px 18px;background:linear-gradient(110deg,#8052d6,#d946a6);color:#fff;font:800 14px system-ui;box-shadow:0 10px 30px #0005;cursor:pointer}.cb-share-panel{position:fixed;right:20px;bottom:78px;z-index:81;width:min(340px,calc(100vw - 28px));padding:16px;background:#24143f;color:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px #0007}.cb-share-panel[hidden]{display:none}.cb-share-panel h3{margin:0 0 4px;font-size:16px}.cb-share-panel p{margin:0 0 12px;color:var(--muted);font-size:12px}.cb-share-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cb-share-grid a,.cb-share-grid button{display:flex;align-items:center;justify-content:center;min-height:42px;padding:8px 5px;border:1px solid var(--line);border-radius:10px;background:#211435;color:#eee;text-decoration:none;font:700 12px system-ui;cursor:pointer}.cb-share-note{display:block;margin-top:10px;color:var(--muted);font-size:10px}
 @media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}nav{gap:10px}nav a{font-size:11px}}
 @media(max-width:560px){.wrap{padding:0 14px}header{height:auto;min-height:68px;gap:10px;flex-wrap:wrap;padding:10px 0}.brand{font-size:17px}nav{width:100%;overflow-x:auto;padding:3px 0 7px}.hero{padding-top:30px}.grid{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}.search{min-width:100%}.cb-share-fab{right:13px;bottom:90px}.cb-share-panel{right:13px;bottom:148px}}
+
+/* CreatorBoost responsive layout safeguards */
+html{max-width:100%;overflow-x:hidden}
+body{max-width:100%;overflow-x:hidden}
+img,video,iframe,canvas{max-width:100%}
+main,section,article,.wrap,.panel,.card,.grid>*{min-width:0}
+input,select,textarea{max-width:100%;min-width:0}
+@media(max-width:760px){
+  .wrap{max-width:100%}
+  .layout,.analytics-grid{grid-template-columns:minmax(0,1fr)!important}
+  .panel,.analytics-card{min-width:0}
+}
+@media(max-width:560px){
+  .wrap{padding-left:14px;padding-right:14px}
+  .hero h1{overflow-wrap:anywhere}
+  .toolbar{max-width:100%;flex-wrap:wrap}
+  .toolbar>*{max-width:100%}
+  .panel{min-width:0}
+}
+
 </style>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
