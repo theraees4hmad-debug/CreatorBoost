@@ -8,19 +8,29 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: creatorboost-content-worker
+  cancel-in-progress: false
 jobs:
   run-content-worker:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
-      - name: Invoke scheduled content worker
+      - name: Validate worker secret
         env:
           WORKER_SECRET: ${{ secrets.CONTENT_WORKER_SECRET }}
         run: |
           if [ -z "$WORKER_SECRET" ]; then
-            echo "Skipped: add CONTENT_WORKER_SECRET to GitHub Actions secrets to activate 24/7 scheduling."
-            exit 0
+            echo "::error::Missing GitHub Actions secret CONTENT_WORKER_SECRET. The scheduled worker cannot authenticate."
+            exit 1
           fi
+      - name: Invoke scheduled content worker
+        env:
+          WORKER_SECRET: ${{ secrets.CONTENT_WORKER_SECRET }}
+        run: |
           curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-all-errors --retry-delay 5 \
+            --connect-timeout 15 --max-time 90 \
             -X POST "https://yubjmudsbbgskeqqejob.supabase.co/functions/v1/content-worker" \
             -H "x-worker-secret: $WORKER_SECRET" \
             -H "Content-Type: application/json" \
