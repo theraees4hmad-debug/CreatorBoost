@@ -46,3 +46,13 @@ Instagram publishing requires an eligible professional account and a configured 
 5. Keep review-before-publish enabled for the first test. Verify a generated draft, then approve one queued post.
 6. Check the GitHub Actions worker run and the provider's published post before enabling unattended publishing.
 7. Add provider analytics polling before treating dashboard engagement totals as live metrics.
+
+
+## Public CreatorBoost Newsroom
+
+- Public reader: `news.html`; individual article pages: `article.html?slug=...`.
+- The additive `cb_public_articles` table is publicly readable only for rows with `status = 'published'`; RLS is enabled and anonymous clients have SELECT only.
+- The content worker checks the IGN, GameSpot, YouTube Official Blog and Twitch Blog RSS feeds, skips source URLs already stored, and asks the editorial model to write a short attributed brief using only the source title/description.
+- The worker is capped at 2 new stories per invocation and 12 per UTC day. Feed/API failures are isolated so one unavailable feed does not stop the others.
+- GitHub Actions invokes the worker every five minutes on a best-effort basis. The newsroom is not continuously live unless `CONTENT_WORKER_SECRET` is set to the same value in GitHub Actions and Supabase Edge Function secrets, and `OPENAI_API_KEY` is configured in Supabase.
+- Stories link to their original publisher. The brief is an AI-assisted summary, not independent fact-checking; editorial review remains recommended before fully unattended publication.
