@@ -42,6 +42,15 @@ input,select,textarea{max-width:100%;min-width:0}
   .panel{min-width:0}
 }
 
+
+/* Unified CreatorBoost navigation */
+header{position:relative;z-index:20}
+.cb-site-nav{display:flex;align-items:center;justify-content:flex-end;gap:5px;min-width:0;max-width:100%;padding:6px;border:1px solid var(--line,#eadff5);border-radius:15px;background:rgba(255,255,255,.58);backdrop-filter:blur(14px)}
+.cb-site-nav a{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;padding:9px 11px;border-radius:10px;text-decoration:none;font-size:12px;font-weight:750;line-height:1.2;color:var(--muted,#756b83);transition:background .18s,color .18s,transform .18s}
+.cb-site-nav a:hover{background:rgba(128,82,214,.11);color:var(--purple,#8052d6);transform:translateY(-1px)}
+.cb-site-nav a[aria-current="page"]{color:#fff;background:linear-gradient(110deg,#8052d6,#d946a6);box-shadow:0 5px 14px rgba(128,82,214,.2)}
+@media(max-width:900px){.cb-site-nav{gap:2px;padding:4px}.cb-site-nav a{padding:9px 8px;font-size:11px}}
+@media(max-width:680px){header{height:auto!important;min-height:68px;flex-wrap:wrap;gap:10px;padding-top:10px!important;padding-bottom:10px!important}.cb-site-nav{order:3;width:100%;justify-content:flex-start;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}.cb-site-nav::-webkit-scrollbar{display:none}.cb-site-nav a{flex:0 0 auto;padding:10px 12px;font-size:12px}.brand{flex:1}}
 </style>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -56,7 +65,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MVKDG8SD"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
-<header class="wrap"><a class="brand" href="index.html"><span class="mark">C</span>CreatorBoost</a><nav aria-label="Main navigation"><a href="index.html">Dashboard</a><a href="subscribers.html">Subscribers</a><a href="live.html">Live Hub</a><a href="news.html">Newsroom</a></nav></header>
+<header class="wrap"><a class="brand" href="index.html"><span class="mark">C</span>CreatorBoost</a><nav class="cb-site-nav" aria-label="Main navigation"><a href="index.html">Overview</a><a href="news.html">Newsroom</a><a href="live.html">Live Hub</a><a href="subscribers.html" aria-current="page">Subscribers</a><a href="gear.html">Gaming Gear</a><a href="reader.html">My Reads</a><a href="membership.html">Membership</a></nav></header>
 <main class="wrap">
 <section class="hero"><div class="eyebrow">YOUTUBE CREATOR ANALYTICS</div><h1>Subscribers.<br><span style="color:#c4b5fd">Your channel, at a glance.</span></h1><p class="muted">Connect your YouTube account to see your channel's subscriber count, daily growth history and the channels you follow.</p></section>
 <div class="toolbar"><button class="btn" id="connectBtn">Connect YouTube</button><button class="btn secondary hidden" id="refreshBtn">↻ Refresh stats</button><span class="stat-note" id="status" role="status">Checking your CreatorBoost session…</span></div>
