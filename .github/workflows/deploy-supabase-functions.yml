@@ -35,3 +35,6 @@ jobs:
           supabase functions deploy youtube-oauth-callback --project-ref yubjmudsbbgskeqqejob
           supabase functions deploy youtube-connection-status --project-ref yubjmudsbbgskeqqejob
           supabase functions deploy youtube-disconnect --project-ref yubjmudsbbgskeqqejob
+          supabase functions deploy content-generate --project-ref yubjmudsbbgskeqqejob
+          supabase functions deploy content-connect --project-ref yubjmudsbbgskeqqejob
+          supabase functions deploy content-worker --project-ref yubjmudsbbgskeqqejob
