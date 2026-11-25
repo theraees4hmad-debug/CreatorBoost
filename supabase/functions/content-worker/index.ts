@@ -41,6 +41,24 @@ function xmlText(v:string){return v.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,"$1").
 function tagValue(block:string,name:string){const m=block.match(new RegExp("<"+name+"(?:\\s[^>]*)?>([\\s\\S]*?)</"+name+">","i"));return m?xmlText(m[1]):"";}
 function newsCategory(title:string,desc:string,source:string){const s=(title+" "+desc+" "+source).toLowerCase();if(/youtube|creator studio|shorts/.test(s))return "YouTube";if(/twitch|kick\.com|streamer|streaming|livestream/.test(s))return "Streaming";if(/esport|tournament|league of legends|valorant|counter-strike|dota/.test(s))return "Esports";if(/creator|youtuber|influencer/.test(s))return "Creators";return "Gaming";}
 function slugify(s:string){return s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,75)||crypto.randomUUID();}
+const FALLBACK_NEWS_IMAGE="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85";
+function feedImage(block:string){
+ const patterns=[/<media:thumbnail[^>]+url=["']([^"']+)["']/i,/<media:content[^>]+url=["']([^"']+)["']/i,/<enclosure[^>]+url=["']([^"']+)["']/i,/<img[^>]+src=["']([^"']+)["']/i];
+ for(const re of patterns){const u=(block.match(re)||[])[1];if(u&&/^https?:\\/\\//i.test(u))return u.replace(/&amp;/g,"&");}
+ return "";
+}
+async function articleImage(url:string,block:string){
+ const embedded=feedImage(block);if(embedded)return embedded;
+ try{
+  const r=await fetch(url,{headers:{"User-Agent":"Mozilla/5.0 CreatorBoostNewsroom/1.0","Accept":"text/html"},signal:AbortSignal.timeout(9000)});
+  if(r.ok){const html=(await r.text()).slice(0,500000);
+   const tags=[/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i,/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i,/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i];
+   for(const re of tags){const m=html.match(re);if(m?.[1]){const value=m[1].replace(/&amp;/g,"&");return new URL(value,url).href;}}
+  }
+ }catch{}
+ return FALLBACK_NEWS_IMAGE;
+}
+
 async function runPublicNewsroom(apiKey:string){
  const feeds=[
   {name:"IGN",url:"https://feeds.feedburner.com/ign/all",category:"Gaming"},
@@ -74,7 +92,8 @@ async function runPublicNewsroom(apiKey:string){
     const story=JSON.parse(result.choices?.[0]?.message?.content||"{}");
     if(typeof story.body!=="string"||story.body.trim().length<80){failed++;continue;}
     const slug=slugify(story.title||title)+"-"+crypto.randomUUID().slice(0,8);
-    await rest("cb_public_articles",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({source_url:url,source_name:feed.name,source_title:title,title:String(story.title||title).slice(0,240),slug,excerpt:String(story.excerpt||description).slice(0,420),body:story.body.slice(0,12000),category,published_at:new Date().toISOString(),status:"published"})});
+    const image_url=await articleImage(url,block);
+    await rest("cb_public_articles",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({source_url:url,source_name:feed.name,source_title:title,title:String(story.title||title).slice(0,240),slug,excerpt:String(story.excerpt||description).slice(0,420),body:story.body.slice(0,12000),category,image_url,published_at:new Date().toISOString(),status:"published"})});
     published++;
     if(published>=2)break;
    }
