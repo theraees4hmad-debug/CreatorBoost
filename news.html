@@ -119,6 +119,21 @@ input,select,textarea{max-width:100%;min-width:0}
 @media(max-width:800px){.news-layout{grid-template-columns:repeat(2,minmax(0,1fr))!important}.news-layout>#articles>.article{min-height:360px}}
 @media(max-width:560px){.news-layout{grid-template-columns:1fr!important;gap:14px!important}.news-layout>#articles>.article{min-height:0}.news-layout>#cbDonationPanel{max-height:480px!important}.pagination{gap:6px}.pagination button{min-width:36px;height:36px}}
 
+
+/* Exact 3x3 newsroom tiles: eight article cards plus donation card, all identical outer dimensions. */
+@media(min-width:801px){
+  .news-layout{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-auto-rows:430px!important;align-items:stretch!important}
+  .news-layout>#articles>.article,
+  .news-layout>#cbDonationPanel{
+    width:100%!important;height:430px!important;min-height:430px!important;max-height:430px!important;
+    box-sizing:border-box!important;align-self:stretch!important;overflow:hidden!important;
+  }
+  .news-layout>#articles>.article{padding:16px!important}
+  .news-layout>#articles>.article .article-media{flex:0 0 auto;max-height:150px;object-fit:cover}
+  .news-layout>#articles>.article h2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .news-layout>#articles>.article p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .news-layout>#cbDonationPanel{overflow-y:auto!important;padding:16px!important}
+}
 </style><!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
