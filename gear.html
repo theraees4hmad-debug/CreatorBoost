@@ -18,7 +18,8 @@
 <section id="featured"><div class="section-head"><div><div class="kicker">FEATURED PICKS</div><h2>Gear worth checking out</h2><p>Browse selected products and compare current offers.</p></div></div><div class="product-grid" id="productGrid"></div></section>
 <div class="note"><strong>Affiliate disclosure:</strong> Some links on this page are affiliate links. If you buy through them, CreatorBoost may earn a commission at no extra cost to you. Product availability and prices can change. We do not claim to have personally tested every item.<span class="disclosure">As an Amazon Associate I earn from qualifying purchases.</span></div>
 </main><footer class="wrap footer">CreatorBoost · Gaming, streaming and creator gear. Always check specifications, seller ratings, warranty and return terms before buying.</footer>
-<script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+const db=window.supabase.createClient("https://yubjmudsbbgskeqqejob.supabase.co","sb_publishable_Bb3ky6zyibP7LS2dXVZNnA_UYNWezlr");
 const TAG="creatorboosti-21";
 const photo={
  headset:"https://images.tcdn.com.br/img/img_prod/670412/headset_gamer_havit_gamenote_h659d_rgb_preto_4065_1_e66415693d6116319c1c22455f216a40.jpg",
@@ -37,4 +38,9 @@ const products=[
 ];
 const grid=document.getElementById("productGrid");
 grid.innerHTML=products.map(p=>'<article class="product" id="'+p.id+'"><div class="product-photo"><img loading="lazy" src="'+p.img+'" alt="'+p.type+' category inspiration"></div><div class="product-copy"><div class="product-type">'+p.type+'</div><h3>'+p.name+'</h3><p>'+p.desc+'</p><a class="btn" href="https://www.amazon.in/s?k='+encodeURIComponent(p.q)+'&tag='+TAG+'" target="_blank" rel="sponsored nofollow noopener">View on Amazon ↗ <small>(paid link)</small></a></div></article>').join("");
+
+const affiliateSession=sessionStorage.getItem("cb_aff_session")||("aff-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2));sessionStorage.setItem("cb_aff_session",affiliateSession);
+function affiliateDevice(){const u=navigator.userAgent;return /tablet|ipad/i.test(u)?"tablet":/mobile|android|iphone/i.test(u)?"mobile":"desktop"}
+function affiliateBrowser(){const u=navigator.userAgent;return /Edg\//.test(u)?"Edge":/Firefox\//.test(u)?"Firefox":/Chrome\//.test(u)?"Chrome":/Safari\//.test(u)?"Safari":"Other"}
+grid.querySelectorAll(".product .btn").forEach((link,i)=>link.addEventListener("click",()=>{const p=products[i];db.from("cb_newsroom_events").insert({event_type:"affiliate_click",session_key:affiliateSession,page_path:"/gear.html#"+p.id,referrer_host:location.hostname,traffic_source:"Affiliate",utm_source:"amazon",utm_medium:"affiliate",utm_campaign:p.name,device_type:affiliateDevice(),browser_name:affiliateBrowser()}).then(({error})=>{if(error)console.warn("Affiliate click tracking failed",error.message)})}));
 </script></body></html>
