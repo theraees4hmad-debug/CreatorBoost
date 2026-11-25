@@ -22,6 +22,26 @@ nav{display:flex;gap:18px}nav a{color:#d8cce9;text-decoration:none;font-weight:6
 .notice{padding:16px;border:1px dashed #76549a;border-radius:14px;color:var(--muted);text-align:center}.hidden{display:none!important}footer{padding:34px 0 45px;color:var(--muted);font-size:11px}
 @media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.sub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}nav{gap:10px}nav a{font-size:11px}}
 @media(max-width:520px){.wrap{padding:0 14px}header{height:auto;min-height:68px;gap:10px;flex-wrap:wrap;padding:10px 0}.brand{font-size:17px}nav{width:100%;overflow-x:auto;padding:3px 0 7px}.hero{padding-top:30px}.stats,.sub-grid{grid-template-columns:1fr}.card{padding:16px}.section-head{align-items:flex-start;flex-direction:column}.toolbar .btn{flex:1}}
+
+/* CreatorBoost responsive layout safeguards */
+html{max-width:100%;overflow-x:hidden}
+body{max-width:100%;overflow-x:hidden}
+img,video,iframe,canvas{max-width:100%}
+main,section,article,.wrap,.panel,.card,.grid>*{min-width:0}
+input,select,textarea{max-width:100%;min-width:0}
+@media(max-width:760px){
+  .wrap{max-width:100%}
+  .layout,.analytics-grid{grid-template-columns:minmax(0,1fr)!important}
+  .panel,.analytics-card{min-width:0}
+}
+@media(max-width:560px){
+  .wrap{padding-left:14px;padding-right:14px}
+  .hero h1{overflow-wrap:anywhere}
+  .toolbar{max-width:100%;flex-wrap:wrap}
+  .toolbar>*{max-width:100%}
+  .panel{min-width:0}
+}
+
 </style>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
