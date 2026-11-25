@@ -95,3 +95,10 @@ This repository currently has a single-page static frontend, so no Node build st
 ---
 
 **Status note:** GitHub source files can be reviewed here, but a code push alone cannot verify the hosted Supabase schema, payment-provider settlement, OAuth provider configuration, or production user journeys. Mark the go-live checklist complete only after testing those systems in their real environments.
+
+
+## CreatorBoost Newsroom
+
+The public homepage opens the 24/7 gaming and streaming newsroom. Browse `news.html` for Gaming, Streaming, YouTube, Esports and creator stories; each story has its own `article.html?slug=...` page. The existing creator dashboard and wallet remain available at `index.html?page=dashboard` and `index.html?page=wallet`.
+
+The Supabase `content-worker` checks configured RSS feeds and publishes AI-assisted, source-attributed briefs into `cb_public_articles`. It runs through the GitHub Actions schedule every five minutes when `CONTENT_WORKER_SECRET` matches in GitHub Actions and Supabase Edge Function secrets. See `docs/AI_CONTENT_AUTOMATION_SETUP.md` for setup and limitations.
