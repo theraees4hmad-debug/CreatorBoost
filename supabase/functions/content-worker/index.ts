@@ -70,6 +70,15 @@ async function articleImage(url:string,block:string,title:string,slug:string){
  return uniqueNewsImage(title,slug);
 }
 
+async function sendDiscordNews(article:{title:string;excerpt:string;body:string;category:string;source_name:string;source_url:string;slug:string}) {
+ const webhook=Deno.env.get("DISCORD_WEBHOOK_URL");
+ if(!webhook)return {sent:false,reason:"DISCORD_WEBHOOK_URL not configured"};
+ const description=(article.excerpt||article.body.replace(/[#>*_]/g,"").replace(/\\s+/g," ").trim()).slice(0,3500);
+ const payload={username:"CreatorBoost News",embeds:[{title:article.title.slice(0,256),description,url:article.source_url,color:5793266,fields:[{name:"Category",value:article.category.slice(0,100),inline:true},{name:"Source",value:article.source_name.slice(0,100),inline:true}],footer:{text:"CreatorBoost • Gaming & Streaming News"},timestamp:new Date().toISOString()}]};
+ const response=await fetch(webhook,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:AbortSignal.timeout(10000)});
+ if(!response.ok)throw new Error("Discord webhook HTTP "+response.status);
+ return {sent:true};
+}
 async function runPublicNewsroom(apiKey:string){
  const feeds=[
   {name:"IGN",url:"https://feeds.feedburner.com/ign/all",category:"Gaming"},
@@ -104,7 +113,9 @@ async function runPublicNewsroom(apiKey:string){
     if(typeof story.body!=="string"||story.body.trim().length<80){failed++;continue;}
     const slug=slugify(story.title||title)+"-"+crypto.randomUUID().slice(0,8);
     const image_url=await articleImage(url,block,title,slug);
-    await rest("cb_public_articles",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({source_url:url,source_name:feed.name,source_title:title,title:String(story.title||title).slice(0,240),slug,excerpt:String(story.excerpt||description).slice(0,420),body:story.body.slice(0,12000),category,image_url,published_at:new Date().toISOString(),status:"published"})});
+    const article={source_url:url,source_name:feed.name,source_title:title,title:String(story.title||title).slice(0,240),slug,excerpt:String(story.excerpt||description).slice(0,420),body:story.body.slice(0,12000),category,image_url,published_at:new Date().toISOString(),status:"published"};
+    await rest("cb_public_articles",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify(article)});
+    try{await sendDiscordNews(article);}catch(discordError){/* Discord delivery failure must not block newsroom publishing. */}
     published++;
     if(published>=2)break;
    }
