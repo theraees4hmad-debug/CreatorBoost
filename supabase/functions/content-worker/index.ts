@@ -49,12 +49,15 @@ async function runPublicNewsroom(apiKey:string){
   {name:"Twitch Blog",url:"https://blog.twitch.tv/en/feed/",category:"Streaming"}
  ];
  let discovered=0,published=0,skipped=0,failed=0;
+ const today=new Date();today.setUTCHours(0,0,0,0);
+ const daily=await rest("cb_public_articles?published_at=gte."+encodeURIComponent(today.toISOString())+"&select=id");
+ if((daily||[]).length>=12)return {discovered:0,published:0,skipped:0,failed:0,daily_limit:true};
  for(const feed of feeds){
   try{
    const response=await fetch(feed.url,{headers:{"User-Agent":"CreatorBoostNewsroom/1.0 (+https://theraees4hmad-debug.github.io/CreatorBoost/news.html)","Accept":"application/rss+xml, application/atom+xml, application/xml, text/xml"} ,signal:AbortSignal.timeout(12000)});
    if(!response.ok)throw new Error("Feed HTTP "+response.status);
    const xml=await response.text();
-   const blocks=[...xml.matchAll(/<(item|entry)\\b[^>]*>([\\s\\S]*?)<\\/\\1>/gi)].map(m=>m[2]).slice(0,12);
+   const blocks=[...xml.matchAll(/<(item|entry)\b[^>]*>([\\s\\S]*?)<\\/\1>/gi)].map(m=>m[2]).slice(0,12);
    for(const block of blocks){
     const title=tagValue(block,"title");
     const link=tagValue(block,"link")||((block.match(/<link[^>]+href=["']([^"']+)/i)||[])[1]||"");
@@ -73,7 +76,7 @@ async function runPublicNewsroom(apiKey:string){
     const slug=slugify(story.title||title)+"-"+crypto.randomUUID().slice(0,8);
     await rest("cb_public_articles",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({source_url:url,source_name:feed.name,source_title:title,title:String(story.title||title).slice(0,240),slug,excerpt:String(story.excerpt||description).slice(0,420),body:story.body.slice(0,12000),category,published_at:new Date().toISOString(),status:"published"})});
     published++;
-    if(published>=8)break;
+    if(published>=2)break;
    }
   }catch(e){failed++;/* one unavailable feed must not block other sources */}
  }
