@@ -9,3 +9,12 @@ verify_jwt = false
 
 [functions.youtube-disconnect]
 verify_jwt = false
+
+[functions.content-generate]
+verify_jwt = true
+
+[functions.content-connect]
+verify_jwt = true
+
+[functions.content-worker]
+verify_jwt = false
