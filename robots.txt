@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://theraees4hmad-debug.github.io/CreatorBoost/sitemap.xml
