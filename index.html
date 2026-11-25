@@ -1148,7 +1148,7 @@ async function runProfileSocialSearch(){
    rows=[{title:"Public social profile or content",url:directUrl,content:"Direct link supplied. Preview it before adding to your profile."}];
   }else{
    const searchQuery=(q.startsWith("@")?q+" creator profile":q)+" social media creator profile account content";
-   const {data,error}=await authClient.functions.invoke("tavily-social-search",{body:{query:searchQuery,platform}});
+   const {data,error}=await authClient.functions.invoke("tavily-social-search",{body:{query:searchQuery,platform},headers:{"Content-Type":"application/json","Accept":"application/json"}});
    if(error){let detail="";try{detail=await error.context?.clone?.text?.()||"";}catch{}throw new Error(detail||error.message||"Search service request failed.");}
    if(data?.error)throw new Error(data.error);
    rows=Array.isArray(data?.results)?data.results:[];
