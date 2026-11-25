@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#160d2b">
+<meta name="description" content="YouTube subscriber analytics and subscriptions for CreatorBoost creators.">
+<link rel="canonical" href="https://theraees4hmad-debug.github.io/CreatorBoost/subscribers.html">
+<title>YouTube Subscribers — CreatorBoost</title>
+<style>
+:root{color-scheme:dark;--bg:#160d2b;--panel:#24143f;--line:#49316e;--muted:#c6b8dc;--purple:#a78bfa;--pink:#e879c3;--green:#75e5ba}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -8%,#56327f 0,transparent 38%),var(--bg);color:#fff;font:15px/1.55 system-ui,Segoe UI,sans-serif}
+.wrap{width:min(1120px,100%);margin:auto;padding:0 20px}header{height:74px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.brand{font-size:20px;font-weight:850;text-decoration:none;color:#fff}.mark{display:inline-grid;place-items:center;width:34px;height:34px;margin-right:8px;border-radius:11px;background:linear-gradient(135deg,#9b78ff,#e879c3)}
+nav{display:flex;gap:18px}nav a{color:#d8cce9;text-decoration:none;font-weight:650;font-size:13px}nav a:hover{color:#fff}
+.hero{padding:42px 0 22px}.eyebrow{font-size:11px;letter-spacing:1.8px;font-weight:850;color:var(--pink)}h1{font-size:clamp(34px,6vw,54px);line-height:1.05;letter-spacing:-1.8px;margin:9px 0 10px}.muted{color:var(--muted)}.hero p{max-width:650px;margin:0}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}.btn{border:0;border-radius:11px;padding:11px 16px;background:linear-gradient(110deg,#8b5cf6,#d946a6);color:#fff;font-weight:800;cursor:pointer}.btn.secondary{background:#302047;border:1px solid var(--line)}.btn:disabled{opacity:.55;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{min-width:0;padding:20px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#2a1946,#1b112e);box-shadow:0 12px 32px #0002}.stat-label{font-size:12px;color:var(--muted);font-weight:700}.stat-value{font-size:clamp(25px,4vw,36px);font-weight:900;letter-spacing:-1px;margin:7px 0 2px}.stat-note{font-size:12px;color:var(--muted)}
+.channel{display:flex;align-items:center;gap:14px;margin-bottom:17px}.avatar{width:58px;height:58px;border-radius:50%;object-fit:cover;background:#38265f}.channel h2{font-size:19px;margin:0}.channel p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:34px 0 14px}.section-head h2{margin:0;font-size:23px}.section-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
+.history{display:flex;align-items:end;gap:7px;height:110px;margin-top:16px;padding:10px 0 0}.bar{flex:1;min-width:5px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#e879c3,#8b5cf6);position:relative}.bar small{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);white-space:nowrap}
+.sub-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.sub{display:flex;align-items:center;gap:12px;min-width:0;padding:13px;border:1px solid var(--line);border-radius:14px;background:#211435}.sub img{width:46px;height:46px;flex:0 0 46px;border-radius:50%;object-fit:cover;background:#392658}.sub b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.sub a{color:#c4b5fd;text-decoration:none;font-size:11px}
+.notice{padding:16px;border:1px dashed #76549a;border-radius:14px;color:var(--muted);text-align:center}.hidden{display:none!important}footer{padding:34px 0 45px;color:var(--muted);font-size:11px}
+@media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.sub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}nav{gap:10px}nav a{font-size:11px}}
+@media(max-width:520px){.wrap{padding:0 14px}header{height:auto;min-height:68px;gap:10px;flex-wrap:wrap;padding:10px 0}.brand{font-size:17px}nav{width:100%;overflow-x:auto;padding:3px 0 7px}.hero{padding-top:30px}.stats,.sub-grid{grid-template-columns:1fr}.card{padding:16px}.section-head{align-items:flex-start;flex-direction:column}.toolbar .btn{flex:1}}
+</style>
+</head>
+<body>
+<header class="wrap"><a class="brand" href="index.html"><span class="mark">C</span>CreatorBoost</a><nav aria-label="Main navigation"><a href="index.html">Dashboard</a><a href="subscribers.html">Subscribers</a><a href="live.html">Live Hub</a><a href="news.html">Newsroom</a></nav></header>
+<main class="wrap">
+<section class="hero"><div class="eyebrow">YOUTUBE CREATOR ANALYTICS</div><h1>Subscribers.<br><span style="color:#c4b5fd">Your channel, at a glance.</span></h1><p class="muted">Connect your YouTube account to see your channel's subscriber count, daily growth history and the channels you follow.</p></section>
+<div class="toolbar"><button class="btn" id="connectBtn">Connect YouTube</button><button class="btn secondary hidden" id="refreshBtn">↻ Refresh stats</button><span class="stat-note" id="status" role="status">Checking your CreatorBoost session…</span></div>
+<section id="dashboard" class="hidden">
+<div class="card" style="margin-bottom:14px"><div class="channel"><img class="avatar" id="channelAvatar" alt="" src=""><div><h2 id="channelName">Your YouTube channel</h2><p id="channelMeta">Connected channel</p></div></div><div class="stats">
+<div class="card"><div class="stat-label">SUBSCRIBERS</div><div class="stat-value" id="subscriberCount">—</div><div class="stat-note" id="subscriberNote">Your public subscriber count</div></div>
+<div class="card"><div class="stat-label">7-DAY CHANGE</div><div class="stat-value" id="growthCount">—</div><div class="stat-note">Compared with the first saved snapshot from 7+ days ago</div></div>
+<div class="card"><div class="stat-label">CHANNEL VIEWS</div><div class="stat-value" id="viewCount">—</div><div class="stat-note" id="videoCount">Videos published</div></div>
+</div></div>
+<div class="card"><div class="section-head" style="margin:0"><div><h2>Subscriber growth</h2><p>One snapshot is saved per day when you refresh this dashboard</p></div></div><div class="history" id="history"></div><div class="stat-note" id="historyNote" style="margin-top:18px"></div></div>
+<div class="section-head"><div><h2>Channels you subscribe to</h2><p id="subscriptionMeta">Your YouTube subscriptions</p></div><a href="https://www.youtube.com/feed/channels" target="_blank" rel="noopener" style="color:#c4b5fd;text-decoration:none;font-size:12px">Manage on YouTube ↗</a></div>
+<div id="subscriptions" class="sub-grid"></div>
+<div class="notice" style="margin-top:16px">YouTube provides your channel's subscriber count, but it does not provide a list of individual people subscribed to your channel. This list shows the channels you subscribe to.</div>
+</section>
+<div id="emptyState" class="notice">Sign in to CreatorBoost, then connect your YouTube account to load your subscriber dashboard.</div>
+</main>
+<footer class="wrap">CreatorBoost · YouTube data is retrieved with your permission and is not used to change your wallet or campaign balance.</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const db=window.supabase.createClient("https://yubjmudsbbgskeqqejob.supabase.co","sb_publishable_Bb3ky6zyibP7LS2dXVZNnA_UYNWezlr");
+const $=id=>document.getElementById(id);
+const esc=s=>String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let session=null;
+function setStatus(s){$("status").textContent=s}
+function fmt(v){return Number(v||0).toLocaleString("en-IN")}
+async function loadDashboard(){
+ setStatus("Loading YouTube stats…");$("refreshBtn").disabled=true;
+ const {data,error}=await db.functions.invoke("youtube-creator-data",{body:{}});
+ $("refreshBtn").disabled=false;
+ if(error||!data){setStatus(error?.message||"Could not load YouTube data.");return}
+ if(data.error){setStatus(data.error);if(data.reconnectRequired){$("connectBtn").classList.remove("hidden")}return}
+ if(!data.connected){setStatus("Connect your YouTube channel to continue.");$("connectBtn").classList.remove("hidden");return}
+ $("dashboard").classList.remove("hidden");$("emptyState").classList.add("hidden");$("connectBtn").classList.add("hidden");$("refreshBtn").classList.remove("hidden");
+ $("channelName").textContent=data.channel.title;
+ $("channelMeta").textContent="Connected to YouTube · "+new Date(data.refreshedAt).toLocaleString();
+ $("channelAvatar").src=data.channel.thumbnail||"";
+ $("subscriberCount").textContent=data.channel.hiddenSubscriberCount?"Hidden":fmt(data.channel.subscriberCount);
+ $("subscriberNote").textContent=data.channel.hiddenSubscriberCount?"This channel hides its subscriber count":"Public channel subscriber count";
+ $("growthCount").textContent=data.growth7d===null?"—":(data.growth7d>0?"+":"")+fmt(data.growth7d);
+ $("viewCount").textContent=fmt(data.channel.viewCount);
+ $("videoCount").textContent=fmt(data.channel.videoCount)+" videos published";
+ const hist=data.history||[];const values=hist.map(x=>Number(x.subscriber_count||0));const min=Math.min(...values,0),max=Math.max(...values,1),range=Math.max(1,max-min);
+ $("history").innerHTML=hist.length?hist.map(x=>'<div class="bar" style="height:'+Math.max(12,24+(Number(x.subscriber_count)-min)/range*76)+'%"><small>'+new Date(x.captured_on+"T00:00:00Z").toLocaleDateString(undefined,{month:"short",day:"numeric"})+'</small></div>').join(""):'<span class="stat-note">Your daily subscriber history will appear here as snapshots are collected.</span>';
+ $("historyNote").textContent=hist.length+" daily snapshot"+(hist.length===1?"":"s")+" saved";
+ const subs=data.subscriptions||[];
+ $("subscriptionMeta").textContent=fmt(data.subscriptionTotal)+" subscriptions · showing "+subs.length+(data.hasMoreSubscriptions?" of your channels":"");
+ $("subscriptions").innerHTML=subs.length?subs.map(x=>'<article class="sub"><img loading="lazy" src="'+esc(x.thumbnail)+'" alt=""><div><b>'+esc(x.title)+'</b><a href="https://www.youtube.com/channel/'+encodeURIComponent(x.channelId)+'" target="_blank" rel="noopener">Open channel ↗</a></div></article>').join(""):'<div class="notice">No YouTube subscriptions were returned for this account.</div>';
+ setStatus("Updated just now");
+}
+async function startConnect(){
+ if(!session){setStatus("Please sign in to CreatorBoost first.");return}
+ $("connectBtn").disabled=true;setStatus("Opening Google authorization…");
+ const {data,error}=await db.functions.invoke("youtube-oauth-start",{body:{}});
+ $("connectBtn").disabled=false;
+ if(error||!data?.url){setStatus(data?.error||error?.message||"Could not start YouTube connection.");return}
+ location.href=data.url;
+}
+$("connectBtn").addEventListener("click",startConnect);
+$("refreshBtn").addEventListener("click",loadDashboard);
+(async()=>{
+ const {data}=await db.auth.getSession();session=data.session;
+ if(!session){setStatus("Sign in to CreatorBoost first.");$("emptyState").textContent="Please sign in on the CreatorBoost dashboard, then return here to connect YouTube.";return}
+ const params=new URLSearchParams(location.search);
+ if(params.get("youtube")==="connected"){setStatus("YouTube connected. Loading your stats…")}
+ await loadDashboard();
+})();
+</script>
+</body></html>
