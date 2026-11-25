@@ -81,3 +81,32 @@ grant insert on public.cb_newsletter_subscribers to anon,authenticated;
 grant select,update,delete on public.cb_newsletter_subscribers to authenticated;
 grant select on public.cb_live_events to anon,authenticated;
 grant insert,update,delete on public.cb_live_events to authenticated;
+
+
+-- Align policies to avoid overlapping permissive checks and index foreign keys.
+create index if not exists cb_live_events_created_by_idx on public.cb_live_events(created_by);
+create index if not exists cb_newsroom_admins_granted_by_idx on public.cb_newsroom_admins(granted_by);
+create index if not exists cb_reader_bookmarks_article_id_idx on public.cb_reader_bookmarks(article_id);
+drop policy if exists "public can view published live events" on public.cb_live_events;
+drop policy if exists "newsroom admins manage live events" on public.cb_live_events;
+create policy "public and newsroom admins can view live events" on public.cb_live_events for select to anon,authenticated
+using(status='published' or exists(select 1 from public.cb_newsroom_admins a where a.user_id=(select auth.uid())));
+create policy "newsroom admins can insert live events" on public.cb_live_events for insert to authenticated
+with check(exists(select 1 from public.cb_newsroom_admins a where a.user_id=(select auth.uid())));
+create policy "newsroom admins can update live events" on public.cb_live_events for update to authenticated
+using(exists(select 1 from public.cb_newsroom_admins a where a.user_id=(select auth.uid())))
+with check(exists(select 1 from public.cb_newsroom_admins a where a.user_id=(select auth.uid())));
+create policy "newsroom admins can delete live events" on public.cb_live_events for delete to authenticated
+using(exists(select 1 from public.cb_newsroom_admins a where a.user_id=(select auth.uid())));
+drop policy if exists "newsroom admins can manage newsletter" on public.cb_newsletter_subscribers;
+create policy "newsroom admins can read newsletter" on public.cb_newsletter_subscribers for select to authenticated
+using(exists(select 1 from public.cb_newsroom_admins a where a.user_id=(select auth.uid())));
+create policy "newsroom admins can update newsletter" on public.cb_newsletter_subscribers for update to authenticated
+using(exists(select 1 from public.cb_newsroom_admins a where a.user_id=(select auth.uid())))
+with check(exists(select 1 from public.cb_newsroom_admins a where a.user_id=(select auth.uid())));
+create policy "newsroom admins can delete newsletter" on public.cb_newsletter_subscribers for delete to authenticated
+using(exists(select 1 from public.cb_newsroom_admins a where a.user_id=(select auth.uid())));
+drop policy if exists "Public can read published CreatorBoost articles" on public.cb_public_articles;
+create policy "Public and admins can read CreatorBoost articles" on public.cb_public_articles for select to anon,authenticated
+using(status='published' or exists(select 1 from public.cb_newsroom_admins a where a.user_id=(select auth.uid())));
+drop policy if exists "newsroom admins can read all articles" on public.cb_public_articles;
