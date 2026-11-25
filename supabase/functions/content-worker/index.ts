@@ -29,7 +29,10 @@ async function publish(item:any,keyText:string){
  }
  if(item.platform==="x"){
   const r=await fetch("https://api.x.com/2/tweets",{method:"POST",headers:{Authorization:"Bearer "+secret,"Content-Type":"application/json"},body:JSON.stringify({text:[item.body,(item.hashtags||[]).join(" ")].filter(Boolean).join("\n\n").slice(0,280)})});
-  const d=await r.json();if(!r.ok)throw new Error(d?.detail||d?.title||"X publish failed");return {id:d.data?.id||null,url:d.data?.id?"https://x.com/i/status/"+d.data.id:null};
+  const d=await r.json();if(!r.ok)throw new Error(d?.detail||d?.title||"X publish failed");
+  let metrics=null;
+  if(d.data?.id){try{const mr=await fetch("https://api.x.com/2/tweets/"+d.data.id+"?tweet.fields=public_metrics",{headers:{Authorization:"Bearer "+secret}});const md=await mr.json();if(mr.ok)metrics=md.data?.public_metrics||null;}catch{}}
+  return {id:d.data?.id||null,url:d.data?.id?"https://x.com/i/status/"+d.data.id:null,metrics};
  }
  throw new Error("Publishing adapter is not available for "+item.platform+" yet.");
 }
@@ -62,7 +65,10 @@ Deno.serve(async(req:Request)=>{
     if(!lock?.length)continue;
     const result=await publish(item,keyText);
     await rest("cb_content_items?id=eq."+item.id,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({status:"published",published_at:new Date().toISOString(),provider_post_id:result.id,last_error:null})});
-    await rest("cb_content_publications?on_conflict=content_item_id,platform",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({content_item_id:item.id,user_id:item.user_id,platform:item.platform,status:"published",provider_post_id:result.id,response_data:result,attempts:1})});published++;
+    const publicationRows=await rest("cb_content_publications?on_conflict=content_item_id,platform",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=representation"},body:JSON.stringify({content_item_id:item.id,user_id:item.user_id,platform:item.platform,status:"published",provider_post_id:result.id,response_data:result,attempts:1})});
+    const publication=publicationRows?.[0];
+    if(publication?.id&&result.metrics){const pm=result.metrics;await rest("cb_content_metrics",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({publication_id:publication.id,user_id:item.user_id,views:Number(pm.impression_count||0),likes:Number(pm.like_count||0),comments:Number(pm.reply_count||0),shares:Number(pm.retweet_count||0)+Number(pm.quote_count||0),clicks:0,raw_metrics:pm})});}
+    published++;
    }catch(e){
     failed++;const msg=e instanceof Error?e.message:"Publishing failed";
     await rest("cb_content_items?id=eq."+item.id,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({status:"failed",last_error:msg})}).catch(()=>{});
