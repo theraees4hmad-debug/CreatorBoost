@@ -10,7 +10,7 @@ Deno.serve(async(req)=>{
  if(!base||!anon||!service)return json({error:"Content service is not configured."},503);
  if(!key)return json({error:"Account connection is not configured. Add CONTENT_ENCRYPTION_KEY to Supabase Edge Function secrets."},503);
  const u=await fetch(base+"/auth/v1/user",{headers:{apikey:anon,Authorization:auth}});if(!u.ok)return json({error:"Session expired"},401);const user=await u.json();
- let b:any;try{b=await req.json()}catch{return json({error:"Invalid request"},400)}
+ let b;try{b=await req.json()}catch{return json({error:"Invalid request"},400)}
  const platform=b.platform;
  if(!["wordpress","x"].includes(platform))return json({error:"Currently supported publishing connections are WordPress and X."},400);
  let accountId="",accountName="",siteUrl=null,secret="";
