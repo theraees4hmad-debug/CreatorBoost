@@ -48,6 +48,26 @@ footer{border-color:#eadff5;color:#756b83}
 .account-secure{color:#6f8b7d;font-size:11px;font-weight:700}
 .account-actions .btn{width:auto;min-width:132px;margin:0;padding:10px 15px}
 @media(max-width:560px){.account-card{padding:18px}.account-top{gap:11px;flex-wrap:wrap}.account-avatar{width:46px;height:46px;flex-basis:46px;border-radius:14px}.account-top .pill{margin-left:auto}.account-divider{margin:17px 0}.account-actions{align-items:stretch;flex-direction:column}.account-actions .btn{width:100%}}
+
+/* CreatorBoost responsive layout safeguards */
+html{max-width:100%;overflow-x:hidden}
+body{max-width:100%;overflow-x:hidden}
+img,video,iframe,canvas{max-width:100%}
+main,section,article,.wrap,.panel,.card,.grid>*{min-width:0}
+input,select,textarea{max-width:100%;min-width:0}
+@media(max-width:760px){
+  .wrap{max-width:100%}
+  .layout,.analytics-grid{grid-template-columns:minmax(0,1fr)!important}
+  .panel,.analytics-card{min-width:0}
+}
+@media(max-width:560px){
+  .wrap{padding-left:14px;padding-right:14px}
+  .hero h1{overflow-wrap:anywhere}
+  .toolbar{max-width:100%;flex-wrap:wrap}
+  .toolbar>*{max-width:100%}
+  .panel{min-width:0}
+}
+
 </style><!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
