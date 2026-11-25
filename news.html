@@ -42,13 +42,46 @@
 .news-layout>#cbDonationPanel{margin:30px 0 0!important}
 }
 
-/* Layout repair: keep donation separate from the article card grid. */
-.news-layout{display:block!important}
-.news-layout>#articles{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-.news-layout>#cbDonationPanel{display:grid!important;position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;max-height:none!important;overflow:visible!important;grid-template-columns:1.1fr .9fr!important;align-items:center!important;margin:34px 0 0!important;box-shadow:none!important;grid-column:auto!important;grid-row:auto!important}
+
+
+/* Newsroom: article grid and donation panel are separate vertical sections. */
+.news-layout{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;width:100%;min-width:0}
+.news-layout>#articles{order:1;display:grid!important;width:100%;min-width:0;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important;align-items:stretch}
+.news-layout>#cbDonationPanel{order:2;display:grid!important;position:relative!important;inset:auto!important;float:none!important;grid-column:auto!important;grid-row:auto!important;width:100%!important;max-width:100%!important;min-width:0!important;max-height:none!important;overflow:visible!important;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr)!important;align-items:center!important;gap:22px!important;margin:34px 0 0!important;box-shadow:none!important}
 .news-layout>#cbDonationPanel #cbDonationClose{display:none!important}
-@media(max-width:800px){.news-layout>#articles{grid-template-columns:repeat(2,minmax(0,1fr))}.news-layout>#cbDonationPanel{grid-template-columns:1fr!important}}
-@media(max-width:560px){.news-layout>#articles{grid-template-columns:1fr}.news-layout>#cbDonationPanel{padding:14px!important}}
+.news-layout>#articles>.article{min-width:0;width:100%;height:100%;display:flex;flex-direction:column}
+.news-layout>#articles .article-media{width:100%;aspect-ratio:16/9;object-fit:cover}
+.news-layout>#articles .article h2,.news-layout>#articles .article p{overflow-wrap:anywhere}
+@media(max-width:900px){
+ .news-layout>#articles{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .news-layout>#cbDonationPanel{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(max-width:560px){
+ .news-layout>#articles{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+ .news-layout>#cbDonationPanel{padding:16px!important;margin-top:24px!important}
+ .news-layout>#cbDonationPanel .wallet-card{min-width:0;width:100%}
+}
+
+
+/* CreatorBoost responsive layout safeguards */
+html{max-width:100%;overflow-x:hidden}
+body{max-width:100%;overflow-x:hidden}
+img,video,iframe,canvas{max-width:100%}
+main,section,article,.wrap,.panel,.card,.grid>*{min-width:0}
+input,select,textarea{max-width:100%;min-width:0}
+@media(max-width:760px){
+  .wrap{max-width:100%}
+  .layout,.analytics-grid{grid-template-columns:minmax(0,1fr)!important}
+  .panel,.analytics-card{min-width:0}
+}
+@media(max-width:560px){
+  .wrap{padding-left:14px;padding-right:14px}
+  .hero h1{overflow-wrap:anywhere}
+  .toolbar{max-width:100%;flex-wrap:wrap}
+  .toolbar>*{max-width:100%}
+  .panel{min-width:0}
+}
+
 </style><!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
