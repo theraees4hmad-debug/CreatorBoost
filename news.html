@@ -137,6 +137,15 @@ input,select,textarea{max-width:100%;min-width:0}
 
 /* Support button jumps to the visible donation tile and briefly highlights it. */
 #cbDonationPanel.cb-donation-highlight{outline:3px solid #d946a6!important;outline-offset:4px!important;box-shadow:0 0 0 8px #d946a622!important;transition:outline .2s,box-shadow .2s}
+
+/* Unified CreatorBoost navigation */
+header{position:relative;z-index:20}
+.cb-site-nav{display:flex;align-items:center;justify-content:flex-end;gap:5px;min-width:0;max-width:100%;padding:6px;border:1px solid var(--line,#eadff5);border-radius:15px;background:rgba(255,255,255,.58);backdrop-filter:blur(14px)}
+.cb-site-nav a{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;padding:9px 11px;border-radius:10px;text-decoration:none;font-size:12px;font-weight:750;line-height:1.2;color:var(--muted,#756b83);transition:background .18s,color .18s,transform .18s}
+.cb-site-nav a:hover{background:rgba(128,82,214,.11);color:var(--purple,#8052d6);transform:translateY(-1px)}
+.cb-site-nav a[aria-current="page"]{color:#fff;background:linear-gradient(110deg,#8052d6,#d946a6);box-shadow:0 5px 14px rgba(128,82,214,.2)}
+@media(max-width:900px){.cb-site-nav{gap:2px;padding:4px}.cb-site-nav a{padding:9px 8px;font-size:11px}}
+@media(max-width:680px){header{height:auto!important;min-height:68px;flex-wrap:wrap;gap:10px;padding-top:10px!important;padding-bottom:10px!important}.cb-site-nav{order:3;width:100%;justify-content:flex-start;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}.cb-site-nav::-webkit-scrollbar{display:none}.cb-site-nav a{flex:0 0 auto;padding:10px 12px;font-size:12px}.brand{flex:1}}
 </style><!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -148,7 +157,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MVKDG8SD"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) --><header class="wrap"><a class="brand" href="index.html"><span class="mark">C</span>CreatorBoost</a><nav class="nav" aria-label="Main navigation"><a href="news.html">Newsroom</a><a href="live.html">Live Hub</a><a href="gear.html">Gaming Gear</a><a href="subscribers.html">Subscribers</a><a href="reader.html">My Reads</a><a href="membership.html">Membership</a><a href="newsroom-admin.html">Admin</a></nav></header>
+<!-- End Google Tag Manager (noscript) --><header class="wrap"><a class="brand" href="index.html"><span class="mark">C</span>CreatorBoost</a><nav class="cb-site-nav" aria-label="Main navigation"><a href="index.html">Overview</a><a href="news.html" aria-current="page">Newsroom</a><a href="live.html">Live Hub</a><a href="subscribers.html">Subscribers</a><a href="gear.html">Gaming Gear</a><a href="reader.html">My Reads</a><a href="membership.html">Membership</a></nav></header>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"NewsMediaOrganization","name":"CreatorBoost","url":"https://theraees4hmad-debug.github.io/CreatorBoost/news.html","description":"Independent gaming, streaming, YouTube and esports news."}</script><main class="wrap"><section class="hero"><div class="eyebrow">THE CREATOR CULTURE NEWSROOM</div><h1>Gaming & streaming.<br><span class="gradient">Always on.</span></h1><p class="lead">Fresh stories from gaming, YouTube, streaming and esports. CreatorBoost brings the latest updates into one independent newsroom.</p><div class="live"><span class="dot"></span> AUTOMATED NEWS FEED</div></section>
 <div class="toolbar"><div class="filters" id="filters"><button class="chip active" data-category="All">All stories</button><button class="chip" data-category="Gaming">Gaming</button><button class="chip" data-category="Streaming">Streaming</button><button class="chip" data-category="YouTube">YouTube</button><button class="chip" data-category="Esports">Esports</button><button class="chip" data-category="Creators">Creators</button></div><input class="search" id="search" type="search" placeholder="Search stories…"></div>
 <div class="news-layout"><div class="grid" id="articles"><div class="empty">Loading the latest stories…</div></div><section class="wrap support is-open" id="cbDonationPanel" aria-labelledby="support-title"><button id="cbDonationClose" type="button" aria-label="Close donation panel">×</button>
