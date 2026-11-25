@@ -6,22 +6,43 @@ on:
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
+
 permissions:
   contents: read
+
+concurrency:
+  group: creatorboost-content-worker
+  cancel-in-progress: false
+
 jobs:
   run-content-worker:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Invoke scheduled content worker
         env:
           WORKER_SECRET: ${{ secrets.CONTENT_WORKER_SECRET }}
         run: |
           if [ -z "$WORKER_SECRET" ]; then
-            echo "Skipped: add CONTENT_WORKER_SECRET to GitHub Actions secrets to activate 24/7 scheduling."
-            exit 0
+            echo "::error::Missing GitHub Actions secret CONTENT_WORKER_SECRET."
+            echo "Add the same secret value to GitHub Actions and Supabase Edge Function secrets."
+            exit 1
           fi
-          curl --fail-with-body --silent --show-error \
+
+          response_file="$(mktemp)"
+          http_code="$(curl --silent --show-error --max-time 240 \
+            -o "$response_file" -w "%{http_code}" \
             -X POST "https://yubjmudsbbgskeqqejob.supabase.co/functions/v1/content-worker" \
             -H "x-worker-secret: $WORKER_SECRET" \
             -H "Content-Type: application/json" \
-            --data '{}'
+            --data '{}')"
+          cat "$response_file"
+
+          if [ "$http_code" = "401" ]; then
+            echo "::error::Worker rejected CONTENT_WORKER_SECRET. The GitHub Actions and Supabase secrets do not match."
+            exit 1
+          fi
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "::error::Content worker returned HTTP $http_code."
+            exit 1
+          fi
