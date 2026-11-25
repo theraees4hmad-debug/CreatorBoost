@@ -27,17 +27,18 @@
 
 @media(min-width:561px){#cbDonateFab{display:none!important}#cbDonationPanel{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;max-height:none!important;overflow:visible!important;display:grid!important;grid-template-columns:1.1fr .9fr!important;align-items:center!important;margin:34px auto 0!important;box-shadow:none!important}#cbDonationClose{display:none!important}}
 
-/* Desktop newsroom: donation panel sits beside the stories at one article-card width. */
+/* Desktop newsroom: one continuous 3-column grid; donation is the final, right-aligned cell. */
 @media(min-width:801px){
-.news-layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(280px,1fr);gap:15px;align-items:start}
-.news-layout>.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-.news-layout>#cbDonationPanel{width:100%!important;min-width:0;margin:0!important;grid-template-columns:1fr!important;align-content:start;padding:19px}
+.news-layout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;align-items:stretch}
+.news-layout>#articles{display:contents}
+.news-layout>#cbDonationPanel{grid-column:3;grid-row:auto;width:100%!important;min-width:0;margin:0!important;grid-template-columns:1fr!important;align-content:start;padding:19px}
 .news-layout>#cbDonationPanel .support-copy h2{font-size:23px}
 .news-layout>#cbDonationPanel .support-copy p{font-size:13px}
 .news-layout>#cbDonationPanel .wallet-card{padding:14px}
 }
 @media(max-width:800px){
 .news-layout{display:block}
+.news-layout>#articles{display:grid}
 .news-layout>#cbDonationPanel{margin:30px 0 0!important}
 }
 </style></head><body><header class="wrap"><a class="brand" href="index.html"><span class="mark">C</span>CreatorBoost</a><nav class="nav" aria-label="Main navigation"><a href="news.html">Newsroom</a><a href="live.html">Live Hub</a><a href="reader.html">My Reads</a><a href="membership.html">Membership</a><a href="newsroom-admin.html">Admin</a></nav></header>
