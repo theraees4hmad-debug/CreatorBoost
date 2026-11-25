@@ -85,6 +85,40 @@ input,select,textarea{max-width:100%;min-width:0}
   .panel{min-width:0}
 }
 
+
+/* Newsroom pagination: 8 stories, then the donation tile in cell 9. */
+.news-layout{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:15px!important;align-items:stretch!important}
+.news-layout>#articles{display:contents!important}
+.news-layout>#articles>.article{min-width:0;width:100%;height:100%;min-height:390px}
+.news-layout>#cbDonationPanel{grid-column:auto!important;grid-row:auto!important;display:flex!important;flex-direction:column!important;gap:10px!important;align-self:stretch!important;height:100%!important;min-height:0!important;max-height:430px!important;overflow:auto!important;width:100%!important;min-width:0!important;margin:0!important;padding:16px!important;border-radius:17px!important}
+.news-layout>#cbDonationPanel .support-copy h2{font-size:19px!important;line-height:1.15!important;margin:5px 0!important}
+.news-layout>#cbDonationPanel .support-copy p{font-size:11px!important;line-height:1.35!important;margin:5px 0 8px!important}
+.news-layout>#cbDonationPanel .wallet-trust{font-size:10px!important;gap:8px!important}
+.news-layout>#cbDonationPanel .wallet-card{padding:11px!important;border-radius:13px!important}
+.news-layout>#cbDonationPanel .wallet-head{margin-bottom:7px!important}
+.news-layout>#cbDonationPanel .wallet-title{font-size:14px!important}
+.news-layout>#cbDonationPanel .wallet-symbol{width:30px;height:30px}
+.news-layout>#cbDonationPanel .amount-entry{padding:5px 8px!important;margin:4px 0 7px!important}
+.news-layout>#cbDonationPanel .amount-entry input{font-size:19px!important}
+.news-layout>#cbDonationPanel .amounts{gap:4px!important;margin-bottom:8px!important}
+.news-layout>#cbDonationPanel .amount{padding:6px 2px!important;font-size:11px!important}
+.news-layout>#cbDonationPanel .pay-methods{gap:4px!important;margin-bottom:7px!important}
+.news-layout>#cbDonationPanel .pay-method{padding:6px 2px!important}
+.news-layout>#cbDonationPanel .method-logo{height:23px;min-width:30px}
+.news-layout>#cbDonationPanel .pay-method strong{font-size:10px!important}
+.news-layout>#cbDonationPanel .pay-method small{font-size:9px!important}
+.news-layout>#cbDonationPanel .payment-details{padding:8px!important}
+.news-layout>#cbDonationPanel .detail-row{padding:6px 0!important}
+.news-layout>#cbDonationPanel .wallet-foot{font-size:9px!important;margin-top:7px!important}
+.news-layout>#cbDonationPanel #cbDonationClose{display:none!important}
+.pagination{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin:26px 0 8px}
+.pagination button{min-width:40px;height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#50366c;font:750 14px system-ui;cursor:pointer}
+.pagination button[aria-current="page"]{background:linear-gradient(110deg,#8052d6,#d946a6);border-color:transparent;color:#fff}
+.pagination button:disabled{opacity:.4;cursor:not-allowed}
+.pagination .page-ellipsis{color:var(--muted);padding:0 2px}
+@media(max-width:800px){.news-layout{grid-template-columns:repeat(2,minmax(0,1fr))!important}.news-layout>#articles>.article{min-height:360px}}
+@media(max-width:560px){.news-layout{grid-template-columns:1fr!important;gap:14px!important}.news-layout>#articles>.article{min-height:0}.news-layout>#cbDonationPanel{max-height:480px!important}.pagination{gap:6px}.pagination button{min-width:36px;height:36px}}
+
 </style><!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -114,7 +148,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="payment-details" id="paymentDetails" aria-live="polite" hidden></div>
 <div class="wallet-foot">Please verify the recipient and amount in your payment app before confirming the transfer.</div>
 </div>
-</section></div></main>
+</section></div><nav class="pagination" id="newsPagination" aria-label="News pages"></nav></main>
 <section class="wrap" style="margin-top:34px;padding:22px;border:1px solid #eadff5;border-radius:18px;background:#fff"><div class="eyebrow">THE CREATORBOOST BRIEFING</div><h2 style="margin:6px 0;color:#392449">Get the latest creator news</h2><p style="color:#756b83">A concise newsletter for gaming, streaming and creator culture.</p><form id="newsletterForm" style="display:flex;gap:8px;flex-wrap:wrap"><input id="newsletterEmail" type="email" required placeholder="Your email address" style="flex:1;min-width:190px;padding:12px;border:1px solid #eadff5;border-radius:10px"><button class="donate" style="width:auto;padding:12px 18px" type="submit">Subscribe</button></form><small id="newsletterStatus" style="display:block;margin-top:8px;color:#756b83">By subscribing, you agree to receive CreatorBoost newsroom updates. You can unsubscribe anytime.</small></section>
 <footer class="wrap">© 2026 CreatorBoost Newsroom · <a href="membership.html">Membership</a> · Stories link to their original sources. Always check the source for full context.</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
@@ -123,9 +157,9 @@ function cbTrackSource(){const p=new URLSearchParams(location.search),ref=docume
 const newsroomSession=(()=>{let v=localStorage.getItem("cb_news_session");if(!v){v=crypto.randomUUID();localStorage.setItem("cb_news_session",v)}return v})();
 db.from("cb_newsroom_events").insert({event_type:"page_view",session_key:newsroomSession,page_path:location.pathname,...cbTrackSource()}).then(()=>{});
 document.getElementById("newsletterForm")?.addEventListener("submit",async e=>{e.preventDefault();const status=document.getElementById("newsletterStatus");const email=document.getElementById("newsletterEmail").value.trim().toLowerCase();const {error}=await db.from("cb_newsletter_subscribers").insert({email,consent:true,source:"newsroom"});status.textContent=error?(error.code==="23505"?"This email is already subscribed.":error.message):"You are subscribed. Welcome to CreatorBoost!";if(!error)e.target.reset();});
-let all=[],category="All";const root=document.getElementById("articles");
+let all=[],category="All",currentPage=1;const pageSize=8;const root=document.getElementById("articles");const pagination=document.getElementById("newsPagination");
 const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function render(){const q=document.getElementById("search").value.toLowerCase();const seen=new Set();const unique=all.filter(a=>{const key=String(a.slug||a.title||"").trim().toLowerCase();if(!key||seen.has(key))return false;seen.add(key);return true});const rows=unique.filter(a=>(category==="All"||a.category===category)&&[a.title,a.excerpt,a.category].join(" ").toLowerCase().includes(q));root.innerHTML=rows.length?rows.map(a=>'<article class="article">'+'<img class="article-media" src="'+esc(a.image_url||"https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85")+'" alt="'+esc(a.title)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=&quot;https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85&quot;">'+'<div class="category">'+esc(a.category)+'</div><h2><a href="article.html?slug='+encodeURIComponent(a.slug)+'">'+esc(a.title)+'</a></h2><p>'+esc(a.excerpt)+'</p><div class="meta"><span>'+esc(a.source_name)+'</span><time>'+new Date(a.published_at).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})+'</time></div><button class="cb-card-share" type="button" data-share-slug="'+encodeURIComponent(a.slug)+'" data-share-title="'+esc(a.title)+'">↗ Share story</button></article>').join(""):'<div class="empty">No stories found in this category yet. Check back soon.</div>'}
+function render(){const q=document.getElementById("search").value.toLowerCase();const seen=new Set();const unique=all.filter(a=>{const key=String(a.slug||a.title||"").trim().toLowerCase();if(!key||seen.has(key))return false;seen.add(key);return true});const rows=unique.filter(a=>(category==="All"||a.category===category)&&[a.title,a.excerpt,a.category].join(" ").toLowerCase().includes(q));const pages=Math.max(1,Math.ceil(rows.length/pageSize));currentPage=Math.min(currentPage,pages);const visible=rows.slice((currentPage-1)*pageSize,currentPage*pageSize);root.innerHTML=visible.length?visible.map(a=>'<article class="article">'+'<img class="article-media" src="'+esc(a.image_url||"https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85")+'" alt="'+esc(a.title)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=&quot;https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85&quot;">'+'<div class="category">'+esc(a.category)+'</div><h2><a href="article.html?slug='+encodeURIComponent(a.slug)+'">'+esc(a.title)+'</a></h2><p>'+esc(a.excerpt)+'</p><div class="meta"><span>'+esc(a.source_name)+'</span><time>'+new Date(a.published_at).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})+'</time></div><button class="cb-card-share" type="button" data-share-slug="'+encodeURIComponent(a.slug)+'" data-share-title="'+esc(a.title)+'">↗ Share story</button></article>').join(""):'<div class="empty">No stories found in this category yet. Check back soon.</div>';const windowSize=7;let first=Math.max(1,Math.min(currentPage-3,pages-windowSize+1));first=Math.max(1,first);let last=Math.min(pages,first+windowSize-1);let buttons='';if(pages>1){buttons+='<button type="button" data-page="'+(currentPage-1)+'" '+(currentPage===1?'disabled':'')+' aria-label="Previous page">‹</button>';for(let p=first;p<=last;p++)buttons+='<button type="button" data-page="'+p+'" '+(p===currentPage?'aria-current="page"':'')+'>'+p+'</button>';buttons+='<button type="button" data-page="'+(currentPage+1)+'" '+(currentPage===pages?'disabled':'')+' aria-label="Next page">›</button>';}pagination.innerHTML=buttons;pagination.hidden=pages<=1;}
 document.addEventListener("click",event=>{const donateFab=event.target.closest("#cbDonateFab");if(!donateFab)return;const donationPanel=document.getElementById("cbDonationPanel");if(!donationPanel)return;const open=!donationPanel.classList.contains("is-open");donationPanel.classList.toggle("is-open",open);donateFab.setAttribute("aria-expanded",String(open))});document.getElementById("cbDonationClose")?.addEventListener("click",()=>{const p=document.getElementById("cbDonationPanel");p.classList.remove("is-open");document.getElementById("cbDonateFab")?.setAttribute("aria-expanded","false")});const amountInput=document.getElementById("donationAmount");
 document.querySelectorAll(".amount").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".amount").forEach(x=>x.classList.toggle("active",x===b));amountInput.value=b.dataset.amount}));
 amountInput.addEventListener("input",()=>document.querySelectorAll(".amount").forEach(x=>x.classList.toggle("active",Number(x.dataset.amount)===Number(amountInput.value))));
@@ -142,7 +176,7 @@ const defaultUpiMethod=document.querySelector('.pay-method[data-method="upi"]');
 document.addEventListener("click",e=>{const pay=e.target.closest("#cbUpiPay");if(!pay)return;const amount=Number(amountInput.value);if(!Number.isFinite(amount)||amount<=0){amountInput.focus();amountInput.setCustomValidity("Enter a valid donation amount.");amountInput.reportValidity();return}amountInput.setCustomValidity("");const params=new URLSearchParams({pa:"9559921620@ybl",pn:"CreatorBoost",am:amount.toFixed(2),cu:"INR",tn:"Support CreatorBoost"});location.href="upi://pay?"+params.toString()});
 document.addEventListener("click",async e=>{const b=e.target.closest("button[data-copy]");if(!b)return;const value=b.dataset.copy;try{await navigator.clipboard.writeText(value);const old=b.textContent;b.textContent="Copied";setTimeout(()=>b.textContent=old,1400)}catch{b.textContent="Select & copy";}});
 root.addEventListener("click",async e=>{const b=e.target.closest("[data-share-slug]");if(!b)return;const u=new URL("article.html",location.href);u.searchParams.set("slug",decodeURIComponent(b.dataset.shareSlug));const payload={title:b.dataset.shareTitle,text:b.dataset.shareTitle,url:u.href};if(navigator.share){try{await navigator.share(payload);}catch(err){}}else{try{await navigator.clipboard.writeText(u.href);b.textContent="Link copied";}catch{b.textContent="Copy unavailable";}}});
-document.getElementById("filters").addEventListener("click",e=>{const b=e.target.closest("button[data-category]");if(!b)return;category=b.dataset.category;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x===b));render()});document.getElementById("search").addEventListener("input",render);
+document.getElementById("filters").addEventListener("click",e=>{const b=e.target.closest("button[data-category]");if(!b)return;category=b.dataset.category;currentPage=1;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x===b));render()});document.getElementById("search").addEventListener("input",()=>{currentPage=1;render()});pagination.addEventListener("click",e=>{const b=e.target.closest("button[data-page]");if(!b||b.disabled)return;currentPage=Number(b.dataset.page);render();document.querySelector(".toolbar").scrollIntoView({behavior:"smooth",block:"start"});});
 (async()=>{const {data,error}=await db.from("cb_public_articles").select("title,slug,excerpt,category,source_name,published_at,image_url").eq("status","published").order("published_at",{ascending:false}).limit(60);if(error){root.innerHTML='<div class="empty">The newsroom is being prepared. Please check back soon.</div>';return}all=data||[];render()})();
 </script>
 <button id="cbDonateFab" type="button" aria-expanded="true" aria-controls="cbDonationPanel">♡ Support CreatorBoost</button>
