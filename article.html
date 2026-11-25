@@ -25,6 +25,15 @@ input,select,textarea{max-width:100%;min-width:0}
   .panel{min-width:0}
 }
 
+
+/* Unified CreatorBoost navigation */
+header{position:relative;z-index:20}
+.cb-site-nav{display:flex;align-items:center;justify-content:flex-end;gap:5px;min-width:0;max-width:100%;padding:6px;border:1px solid var(--line,#eadff5);border-radius:15px;background:rgba(255,255,255,.58);backdrop-filter:blur(14px)}
+.cb-site-nav a{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;padding:9px 11px;border-radius:10px;text-decoration:none;font-size:12px;font-weight:750;line-height:1.2;color:var(--muted,#756b83);transition:background .18s,color .18s,transform .18s}
+.cb-site-nav a:hover{background:rgba(128,82,214,.11);color:var(--purple,#8052d6);transform:translateY(-1px)}
+.cb-site-nav a[aria-current="page"]{color:#fff;background:linear-gradient(110deg,#8052d6,#d946a6);box-shadow:0 5px 14px rgba(128,82,214,.2)}
+@media(max-width:900px){.cb-site-nav{gap:2px;padding:4px}.cb-site-nav a{padding:9px 8px;font-size:11px}}
+@media(max-width:680px){header{height:auto!important;min-height:68px;flex-wrap:wrap;gap:10px;padding-top:10px!important;padding-bottom:10px!important}.cb-site-nav{order:3;width:100%;justify-content:flex-start;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}.cb-site-nav::-webkit-scrollbar{display:none}.cb-site-nav a{flex:0 0 auto;padding:10px 12px;font-size:12px}.brand{flex:1}}
 </style><!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -36,7 +45,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MVKDG8SD"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) --><header class="wrap"><nav style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><a class="brand" href="news.html">← CreatorBoost Newsroom</a><a href="live.html">Live Hub</a><a href="gear.html">Gaming Gear</a><a href="reader.html">My Reads</a><a href="membership.html">Membership</a></nav></header><main class="wrap story" id="story">Loading story…</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script><script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script><script>
+<!-- End Google Tag Manager (noscript) --><header class="wrap"><nav class="cb-site-nav" aria-label="Main navigation"><a href="index.html">Overview</a><a href="news.html" aria-current="page">Newsroom</a><a href="live.html">Live Hub</a><a href="subscribers.html">Subscribers</a><a href="gear.html">Gaming Gear</a><a href="reader.html">My Reads</a><a href="membership.html">Membership</a></nav></header><main class="wrap story" id="story">Loading story…</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script><script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script><script>
 const db=window.supabase.createClient("https://yubjmudsbbgskeqqejob.supabase.co","sb_publishable_Bb3ky6zyibP7LS2dXVZNnA_UYNWezlr");const slug=new URLSearchParams(location.search).get("slug");const fallbackStoryImage="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85";const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 (async()=>{const root=document.getElementById("story");if(!slug){root.textContent="Story not found.";return}const {data,error}=await db.from("cb_public_articles").select("*").eq("slug",slug).eq("status","published").maybeSingle();if(error||!data){root.textContent="This story is not available.";return}document.title=data.title+" — CreatorBoost";
 const description=String(data.excerpt||"Gaming and streaming news from CreatorBoost.").slice(0,300);
