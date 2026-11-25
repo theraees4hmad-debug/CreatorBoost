@@ -10,7 +10,7 @@ The AI Studio is available at `content-studio.html` and is linked from the main 
 - `content-worker` processes due schedules and publishing queue.
 - Publishing adapters currently support WordPress posts and X posts.
 - Publishing credentials are encrypted server-side before they are stored in `cb_content_connections`.
-- Analytics tables and dashboard totals are ready to receive provider metrics; automatic metrics polling is not yet implemented.
+- Analytics tables and dashboard totals are ready; the worker captures an X public-metrics snapshot when an X post is published. Periodic refresh and WordPress traffic analytics remain follow-up work.
 - Review-before-publish is the default. Automatic publishing requires the user to disable review and enable generation in AI Studio settings.
 
 ## Required secrets
@@ -31,7 +31,7 @@ The existing `SUPABASE_ACCESS_TOKEN` GitHub Actions secret is also required by t
 Create a WordPress Application Password for a dedicated publishing user. In AI Studio → Settings, enter the HTTPS site URL, WordPress username and Application Password. The credential is encrypted by the Edge Function; it is never stored in browser local storage.
 
 ### X
-Create an X OAuth 2.0 user access token with `tweet.write` permission. In AI Studio → Settings, enter the handle and token. API access and usage are subject to X developer-plan limits.
+Create an X OAuth 2.0 user access token with `tweet.write` and `tweet.read` permissions so the worker can publish and capture public post metrics. In AI Studio → Settings, enter the handle and token. API access and usage are subject to X developer-plan limits.
 
 ## Platform limitations
 
