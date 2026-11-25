@@ -14,7 +14,7 @@ Deno.serve(async(req:Request)=>{
  if(!["wordpress","x"].includes(platform))return json({error:"Currently supported publishing connections are WordPress and X."},400);
  let accountId="",accountName="",siteUrl:string|null=null,secret="";
  if(platform==="wordpress"){
-  try{const url=new URL(String(b.site_url||""));if(url.protocol!=="https:")throw new Error();siteUrl=url.origin;}catch{return json({error:"Enter a valid HTTPS WordPress site URL."},400)}
+  try{const url=new URL(String(b.site_url||""));if(url.protocol!=="https:")throw new Error();siteUrl=url.toString().replace(/\\/$/,"");}catch{return json({error:"Enter a valid HTTPS WordPress site URL."},400)}
   accountName=String(b.username||"").trim().slice(0,120);secret=String(b.application_password||"").trim();
   if(!accountName||!secret)return json({error:"WordPress username and application password are required."},400);
   accountId=siteUrl+"|"+accountName;
