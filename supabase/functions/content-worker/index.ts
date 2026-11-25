@@ -57,13 +57,13 @@ async function runPublicNewsroom(apiKey:string){
    const response=await fetch(feed.url,{headers:{"User-Agent":"CreatorBoostNewsroom/1.0 (+https://theraees4hmad-debug.github.io/CreatorBoost/news.html)","Accept":"application/rss+xml, application/atom+xml, application/xml, text/xml"} ,signal:AbortSignal.timeout(12000)});
    if(!response.ok)throw new Error("Feed HTTP "+response.status);
    const xml=await response.text();
-   const blocks=[...xml.matchAll(/<(item|entry)\b[^>]*>([\\s\\S]*?)<\\/\1>/gi)].map(m=>m[2]).slice(0,12);
+   const blocks=[...xml.matchAll(/<(item|entry)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map(m=>m[2]).slice(0,12);
    for(const block of blocks){
     const title=tagValue(block,"title");
     const link=tagValue(block,"link")||((block.match(/<link[^>]+href=["']([^"']+)/i)||[])[1]||"");
     const description=tagValue(block,"description")||tagValue(block,"summary")||tagValue(block,"content:encoded");
     const url=link.trim();
-    if(!title||!url||!/^https?:\\/\\//i.test(url))continue;
+    if(!title||!url||!/^https?:\/\//i.test(url))continue;
     discovered++;
     const exists=await rest("cb_public_articles?source_url=eq."+encodeURIComponent(url)+"&select=id&limit=1");
     if(exists?.length){skipped++;continue;}
