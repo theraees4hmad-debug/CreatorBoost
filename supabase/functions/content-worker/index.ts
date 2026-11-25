@@ -36,6 +36,50 @@ async function publish(item:any,keyText:string){
  }
  throw new Error("Publishing adapter is not available for "+item.platform+" yet.");
 }
+
+function xmlText(v:string){return v.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g,"$1").replace(/<[^>]+>/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&#x([0-9a-f]+);/gi,(_,n)=>String.fromCodePoint(parseInt(n,16))).replace(/&#(\d+);/g,(_,n)=>String.fromCodePoint(Number(n))).replace(/\s+/g," ").trim();}
+function tagValue(block:string,name:string){const m=block.match(new RegExp("<"+name+"(?:\\s[^>]*)?>([\\s\\S]*?)</"+name+">","i"));return m?xmlText(m[1]):"";}
+function newsCategory(title:string,desc:string,source:string){const s=(title+" "+desc+" "+source).toLowerCase();if(/youtube|creator studio|shorts/.test(s))return "YouTube";if(/twitch|kick\.com|streamer|streaming|livestream/.test(s))return "Streaming";if(/esport|tournament|league of legends|valorant|counter-strike|dota/.test(s))return "Esports";if(/creator|youtuber|influencer/.test(s))return "Creators";return "Gaming";}
+function slugify(s:string){return s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,75)||crypto.randomUUID();}
+async function runPublicNewsroom(apiKey:string){
+ const feeds=[
+  {name:"IGN",url:"https://feeds.feedburner.com/ign/all",category:"Gaming"},
+  {name:"GameSpot",url:"https://www.gamespot.com/feeds/mashup/",category:"Gaming"},
+  {name:"YouTube Official Blog",url:"https://blog.youtube/news-and-events/rss/",category:"YouTube"},
+  {name:"Twitch Blog",url:"https://blog.twitch.tv/en/feed/",category:"Streaming"}
+ ];
+ let discovered=0,published=0,skipped=0,failed=0;
+ for(const feed of feeds){
+  try{
+   const response=await fetch(feed.url,{headers:{"User-Agent":"CreatorBoostNewsroom/1.0 (+https://theraees4hmad-debug.github.io/CreatorBoost/news.html)","Accept":"application/rss+xml, application/atom+xml, application/xml, text/xml"} ,signal:AbortSignal.timeout(12000)});
+   if(!response.ok)throw new Error("Feed HTTP "+response.status);
+   const xml=await response.text();
+   const blocks=[...xml.matchAll(/<(item|entry)\\b[^>]*>([\\s\\S]*?)<\\/\\1>/gi)].map(m=>m[2]).slice(0,12);
+   for(const block of blocks){
+    const title=tagValue(block,"title");
+    const link=tagValue(block,"link")||((block.match(/<link[^>]+href=["']([^"']+)/i)||[])[1]||"");
+    const description=tagValue(block,"description")||tagValue(block,"summary")||tagValue(block,"content:encoded");
+    const url=link.trim();
+    if(!title||!url||!/^https?:\\/\\//i.test(url))continue;
+    discovered++;
+    const exists=await rest("cb_public_articles?source_url=eq."+encodeURIComponent(url)+"&select=id&limit=1");
+    if(exists?.length){skipped++;continue;}
+    const category=newsCategory(title,description,feed.name);
+    const prompt="Write a balanced, original news brief based ONLY on the supplied source title and description. Do not add facts, dates, numbers, quotes, background claims or details not present in the source. If details are missing, say so or keep the brief short. Output JSON only with title, excerpt, body. Body should be 3-5 short paragraphs in Markdown, clearly attributed to the source. Avoid claiming independent verification. Source title: "+title+"\\nSource description: "+description.slice(0,5000)+"\\nPublisher: "+feed.name+"\\nURL: "+url;
+    const ai=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{Authorization:"Bearer "+apiKey,"Content-Type":"application/json"},body:JSON.stringify({model:"gpt-4o-mini",temperature:.2,response_format:{type:"json_object"},messages:[{role:"system",content:"You are a cautious newsroom editor. Summarize only the provided source material. Never invent or infer facts. Return JSON only."},{role:"user",content:prompt}]}) ,signal:AbortSignal.timeout(30000)});
+    const result=await ai.json();if(!ai.ok)throw new Error(result?.error?.message||"Editorial AI request failed");
+    const story=JSON.parse(result.choices?.[0]?.message?.content||"{}");
+    if(typeof story.body!=="string"||story.body.trim().length<80){failed++;continue;}
+    const slug=slugify(story.title||title)+"-"+crypto.randomUUID().slice(0,8);
+    await rest("cb_public_articles",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify({source_url:url,source_name:feed.name,source_title:title,title:String(story.title||title).slice(0,240),slug,excerpt:String(story.excerpt||description).slice(0,420),body:story.body.slice(0,12000),category,published_at:new Date().toISOString(),status:"published"})});
+    published++;
+    if(published>=8)break;
+   }
+  }catch(e){failed++;/* one unavailable feed must not block other sources */}
+ }
+ return {discovered,published,skipped,failed};
+}
+
 Deno.serve(async(req:Request)=>{
  if(req.method!=="POST")return json({error:"POST required"},405);
  const expected=Deno.env.get("CONTENT_WORKER_SECRET"),given=req.headers.get("x-worker-secret");
@@ -75,6 +119,7 @@ Deno.serve(async(req:Request)=>{
     await rest("cb_content_publications?on_conflict=content_item_id,platform",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({content_item_id:item.id,user_id:item.user_id,platform:item.platform,status:"failed",error_message:msg,attempts:1})}).catch(()=>{});
    }
   }
-  return json({ok:true,generated,published,failed,checked_at:now});
+  const newsroom=await runPublicNewsroom(apiKey).catch(()=>({discovered:0,published:0,skipped:0,failed:1}));
+  return json({ok:true,generated,published,failed,newsroom,checked_at:now});
  }catch(e){return json({error:e instanceof Error?e.message:"Worker failed"},500);}
 });
