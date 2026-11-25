@@ -947,6 +947,13 @@ async function recordVerifiedTaskBonuses(rows){
 
 async function loadTaskSubmissions(){
  if(!authClient)return;
+ const catalogMap={
+  ytfeedback:["YouTube","https://www.youtube.com/"],igcollab:["Instagram","https://www.instagram.com/"],kickfeedback:["Kick","https://kick.com/"],ttfeedback:["TikTok","https://www.tiktok.com/"],fbfeedback:["Facebook","https://www.facebook.com/"],xfeedback:["X","https://x.com/"],snapfeedback:["Snapchat","https://www.snapchat.com/"],twitchfeedback:["Twitch","https://www.twitch.tv/"],threadsfeedback:["Threads","https://www.threads.net/"],pinfeedback:["Pinterest","https://www.pinterest.com/"],linkedinfeedback:["LinkedIn","https://www.linkedin.com/"],redditfeedback:["Reddit","https://www.reddit.com/"],profile:["CreatorBoost","https://theraees4hmad-debug.github.io/CreatorBoost/"]
+ };
+ const {data:catalog,error:catalogError}=await authClient.from("cb_task_catalog").select("task_id,title,reward_points,active").eq("active",true);
+ if(catalogError){console.warn("Task catalogue unavailable:",catalogError.message);}else{
+  tasks.splice(0,tasks.length,...(catalog||[]).map(row=>{const meta=catalogMap[row.task_id]||["Social","https://www.youtube.com/"];return {id:row.task_id,n:row.title,d:"Complete genuine creator support for this platform and submit a screenshot for review.",v:Number(row.reward_points||0),p:meta[0],url:meta[1]};}));
+ }
  const {data:{session}}=await authClient.auth.getSession();
  const panel=document.getElementById("taskReviewPanel");
  if(panel&&session){
