@@ -44,7 +44,7 @@ function slugify(s:string){return s.toLowerCase().normalize("NFKD").replace(/[^a
 const FALLBACK_NEWS_IMAGE="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=85";
 function feedImage(block:string){
  const patterns=[/<media:thumbnail[^>]+url=["']([^"']+)["']/i,/<media:content[^>]+url=["']([^"']+)["']/i,/<enclosure[^>]+url=["']([^"']+)["']/i,/<img[^>]+src=["']([^"']+)["']/i];
- for(const re of patterns){const u=(block.match(re)||[])[1];if(u&&/^https?:\\/\\//i.test(u))return u.replace(/&amp;/g,"&");}
+ for(const re of patterns){const u=(block.match(re)||[])[1];if(u&&(u.startsWith("http://")||u.startsWith("https://")))return u.replace(/&amp;/g,"&");}
  return "";
 }
 async function articleImage(url:string,block:string){
