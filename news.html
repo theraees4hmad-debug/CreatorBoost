@@ -44,21 +44,24 @@
 
 
 
-/* Newsroom: article grid and donation panel are separate vertical sections. */
-.news-layout{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;width:100%;min-width:0}
-.news-layout>#articles{order:1;display:grid!important;width:100%;min-width:0;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important;align-items:stretch}
-.news-layout>#cbDonationPanel{order:2;display:grid!important;position:relative!important;inset:auto!important;float:none!important;grid-column:auto!important;grid-row:auto!important;width:100%!important;max-width:100%!important;min-width:0!important;max-height:none!important;overflow:visible!important;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr)!important;align-items:center!important;gap:22px!important;margin:34px 0 0!important;box-shadow:none!important}
+/* Newsroom: articles and donation share one continuous grid.
+   The donation panel naturally occupies the next grid cell after the final article. */
+.news-layout{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important;align-items:stretch!important;width:100%;min-width:0}
+.news-layout>#articles{display:contents!important}
+.news-layout>#cbDonationPanel{display:grid!important;position:relative!important;inset:auto!important;float:none!important;grid-column:auto!important;grid-row:auto!important;width:100%!important;max-width:100%!important;min-width:0!important;max-height:none!important;overflow:visible!important;grid-template-columns:minmax(0,1fr)!important;align-content:start!important;gap:14px!important;margin:0!important;box-shadow:none!important;padding:19px!important}
 .news-layout>#cbDonationPanel #cbDonationClose{display:none!important}
 .news-layout>#articles>.article{min-width:0;width:100%;height:100%;display:flex;flex-direction:column}
 .news-layout>#articles .article-media{width:100%;aspect-ratio:16/9;object-fit:cover}
 .news-layout>#articles .article h2,.news-layout>#articles .article p{overflow-wrap:anywhere}
+.news-layout>#cbDonationPanel .support-copy h2{font-size:23px}
+.news-layout>#cbDonationPanel .support-copy p{font-size:13px}
+.news-layout>#cbDonationPanel .wallet-card{padding:14px}
 @media(max-width:900px){
- .news-layout>#articles{grid-template-columns:repeat(2,minmax(0,1fr))!important}
- .news-layout>#cbDonationPanel{grid-template-columns:minmax(0,1fr)!important}
+ .news-layout{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 @media(max-width:560px){
- .news-layout>#articles{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
- .news-layout>#cbDonationPanel{padding:16px!important;margin-top:24px!important}
+ .news-layout{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+ .news-layout>#cbDonationPanel{padding:16px!important}
  .news-layout>#cbDonationPanel .wallet-card{min-width:0;width:100%}
 }
 
