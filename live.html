@@ -83,6 +83,27 @@ h1,h2,h3,h4,.hero h1,.section-head h2{color:#25243b!important;text-shadow:0 2px 
 @property --cb-angle{syntax:"<angle>";initial-value:0deg;inherits:false}@keyframes cbBorder{to{--cb-angle:360deg}}@keyframes cbHue{to{background-position:180% center}}@keyframes cbFloat{0%,100%{transform:translateY(0) rotate(-4deg);opacity:.55}50%{transform:translateY(-9px) rotate(5deg);opacity:1}}@keyframes cbPulse{0%,100%{box-shadow:0 0 5px #2fbd86}50%{box-shadow:0 0 15px #2fbd86}}
 @media(max-width:700px){body:before{background-size:26px 26px;opacity:.18}.hero:after{font-size:18px;letter-spacing:5px;right:2%;top:5%}.article:hover,.item:hover,.card:hover,.stream:hover,.event:hover,.plan:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Compact creator social hub */
+.cb-creator-hub{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:4px 0 22px;padding:13px 15px;border:1px solid #e4e2f1;border-radius:16px;background:linear-gradient(105deg,rgba(255,255,255,.97),rgba(247,244,255,.96));box-shadow:0 9px 24px #28345b10;position:relative;overflow:hidden}
+.cb-creator-hub:after{content:"";position:absolute;right:-32px;top:-55px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#bda7ff38,transparent 70%);pointer-events:none}
+.cb-creator-intro{position:relative;z-index:1;min-width:155px}
+.cb-creator-kicker{font-size:9px;letter-spacing:1.5px;font-weight:900;color:#8664d8}
+.cb-creator-title{font-size:15px;font-weight:850;line-height:1.25;color:#29243e;margin-top:2px}
+.cb-creator-sub{font-size:10px;color:#7a8093;margin-top:2px}
+.cb-creator-links{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap;position:relative;z-index:1}
+.cb-creator-link{display:inline-flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid #e5e5ef;border-radius:10px;background:#fff;color:#45445b!important;text-decoration:none;font-size:10px;font-weight:800;white-space:nowrap;transition:transform .18s,border-color .18s,box-shadow .18s}
+.cb-creator-link:hover{transform:translateY(-2px);border-color:#b7a5ed;box-shadow:0 5px 13px #7860bd1c}
+.cb-creator-icon{display:grid;place-items:center;width:20px;height:20px;border-radius:6px;color:#fff;font-size:11px;font-weight:950;line-height:1;flex:none}
+.cb-creator-link.kick .cb-creator-icon{background:#101810;color:#53fc18}
+.cb-creator-link.youtube .cb-creator-icon{background:#e62117}
+.cb-creator-link.twitch .cb-creator-icon{background:#9146ff}
+.cb-creator-link.facebook .cb-creator-icon{background:#1877f2}
+.cb-creator-link.instagram .cb-creator-icon{background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)}
+.cb-creator-link.whatsapp .cb-creator-icon{background:#128c7e}
+@media(max-width:760px){.cb-creator-hub{align-items:flex-start;flex-direction:column;gap:10px}.cb-creator-intro{min-width:0}.cb-creator-links{justify-content:flex-start;gap:6px}.cb-creator-link{padding:6px 8px}}
+@media(max-width:390px){.cb-creator-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}.cb-creator-link{justify-content:flex-start;padding:6px 5px;font-size:9px;gap:5px}}
+
 </style>
 </head>
 <body>
@@ -93,6 +114,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header class="wrap"><a class="brand" href="index.html"><span class="mark">C</span>CreatorBoost</a><nav class="cb-site-nav" aria-label="Main navigation"><a href="news.html">Newsroom</a><a href="live.html" aria-current="page">Live Hub</a><a href="gear.html">Gaming Gear</a><a href="reader.html">My Reads</a><a href="membership.html">Membership</a><a href="newsroom-admin.html">Admin Panel</a></nav></header>
 <main class="wrap">
 <section class="hero"><div class="eyebrow">THE LIVE DESK · YOUTUBE + KICK</div><h1>What’s live.<br><span class="gradient">Right now.</span></h1><p class="muted">Discover gaming creators streaming on YouTube and Kick right now, then jump straight into the live stream. Both feeds refresh automatically.</p></section>
+
+<section class="cb-creator-hub" aria-label="Follow Nromyraees on social platforms">
+  <div class="cb-creator-intro">
+    <div class="cb-creator-kicker">✦ THE CREATOR NETWORK</div>
+    <div class="cb-creator-title">Find me everywhere.</div>
+    <div class="cb-creator-sub">Streams, clips &amp; updates in one place.</div>
+  </div>
+  <div class="cb-creator-links">
+    <a class="cb-creator-link kick" href="https://kick.com/msha-voice" target="_blank" rel="noopener noreferrer" aria-label="Follow on Kick"><span class="cb-creator-icon">K</span>Kick</a>
+    <a class="cb-creator-link youtube" href="https://youtube.com/@nromyraees?si=PGm9hltM9LfqzJ_t" target="_blank" rel="noopener noreferrer" aria-label="Subscribe on YouTube"><span class="cb-creator-icon">▶</span>YouTube</a>
+    <a class="cb-creator-link twitch" href="https://www.twitch.tv/nromyraees?sr=a" target="_blank" rel="noopener noreferrer" aria-label="Watch on Twitch"><span class="cb-creator-icon">T</span>Twitch</a>
+    <a class="cb-creator-link instagram" href="https://www.instagram.com/nromyraees?fqnt=MTZ6dTRjZ2kxOHpuZg==" target="_blank" rel="noopener noreferrer" aria-label="Follow on Instagram"><span class="cb-creator-icon">◎</span>Instagram</a>
+    <a class="cb-creator-link facebook" href="https://www.facebook.com/share/1ED3XU1EbA/" target="_blank" rel="noopener noreferrer" aria-label="Follow on Facebook"><span class="cb-creator-icon">f</span>Facebook</a>
+    <a class="cb-creator-link whatsapp" href="https://whatsapp.com/channel/0029VbDjezFLNSaAmWJmhO1e" target="_blank" rel="noopener noreferrer" aria-label="Join WhatsApp channel"><span class="cb-creator-icon">◉</span>WhatsApp</a>
+  </div>
+</section>
 <section>
 <div class="section-head"><div><h2><span style="color:#ff7899">●</span> Live on YouTube + Kick</h2><p>Public live streams · combined ranking by concurrent viewers · refreshed automatically</p></div><span class="status" id="liveStatus">Loading live streams…</span></div>
 <div class="live-tools"><input class="search" id="streamSearch" type="search" placeholder="Search live titles or creators"><button class="chip" id="refreshLive" type="button">↻ Refresh</button></div>
