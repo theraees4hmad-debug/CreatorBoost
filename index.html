@@ -167,7 +167,7 @@ function renderGames(){
   const isAvailable=!!g[5],owned=unlocked.has(g[4]);
   const state=owned?"UNLOCKED":isAvailable?"AVAILABLE":"COMING SOON";
   const action=owned?"PLAY NOW":isAvailable?"Unlock":"Coming soon";
-  return '<article class="game '+(isAvailable?'available':'')+'"><div class="game-cover"><span class="cover-label">'+g[1]+' GAME</span><span class="cover-emoji">'+g[3]+'</span><span class="cover-spark">✦ ✧</span></div><div class="game-content"><div class="tag">'+state+'</div><h3>'+g[0]+'</h3><p>'+g[2]+'</p><div class="game-foot"><span class="price">'+(isAvailable?(owned?'✓ Owned':'₹20 · 2,000 pts'):'Coming soon')+'</span><button data-game="'+g[4]+'" '+(!isAvailable?'disabled':'')+' class="'+(owned?'owned':'')+'">'+action+'</button></div></div></article>';
+  return '<article class="game '+(isAvailable?'available':'')+'"><div class="game-cover" data-kind="'+g[1]+'"><span class="cover-label">CB ARCADE / '+g[1].toUpperCase()+'</span><div class="cover-orbit"></div><div class="cover-hud"><span class="hud-top">SYSTEM ONLINE · 01</span><div class="hud-bottom"><span>LEVEL 01</span><span class="hud-line"></span><span>PLAY MODE</span></div></div><span class="cover-emoji">'+g[3]+'</span><span class="cover-spark">✦ ✧</span></div><div class="game-content"><div class="tag">'+state+'</div><h3>'+g[0]+'</h3><p>'+g[2]+'</p><div class="game-foot"><span class="price">'+(isAvailable?(owned?'✓ Owned':'₹20 · 2,000 pts'):'Coming soon')+'</span><button data-game="'+g[4]+'" '+(!isAvailable?'disabled':'')+' class="'+(owned?'owned':'')+'">'+action+'</button></div></div></article>';
  }).join("");
 }
 async function refreshWallet(){
