@@ -32,6 +32,23 @@ h1,h2,h3,h4,.hero h1,.section-head h2{color:#25243b!important;text-shadow:0 2px 
 @property --cb-angle{syntax:"<angle>";initial-value:0deg;inherits:false}@keyframes cbBorder{to{--cb-angle:360deg}}@keyframes cbHue{to{background-position:180% center}}@keyframes cbFloat{0%,100%{transform:translateY(0) rotate(-4deg);opacity:.55}50%{transform:translateY(-9px) rotate(5deg);opacity:1}}@keyframes cbPulse{0%,100%{box-shadow:0 0 5px #2fbd86}50%{box-shadow:0 0 15px #2fbd86}}
 @media(max-width:700px){body:before{background-size:26px 26px;opacity:.18}.hero:after{font-size:18px;letter-spacing:5px;right:2%;top:5%}.article:hover,.item:hover,.card:hover,.stream:hover,.event:hover,.plan:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Mobile header alignment and navigation overflow fix */
+header.wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;min-width:0}
+header.wrap>.brand{display:inline-flex;align-items:center;gap:9px;flex:0 0 auto;white-space:nowrap;min-width:0}
+header.wrap>.brand .brand-logo{display:block;width:42px;height:42px;min-width:42px;flex:0 0 42px;object-fit:contain}
+header.wrap>.brand .brand-name{display:inline-block;white-space:nowrap;line-height:1.1}
+header.wrap>.cb-site-nav{min-width:0;max-width:100%;flex:0 1 auto}
+@media(max-width:680px){
+  header.wrap{height:auto!important;min-height:68px;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:9px;padding-top:10px!important;padding-bottom:10px!important}
+  header.wrap>.brand{flex:0 0 auto;max-width:100%}
+  header.wrap>.brand .brand-logo{width:38px;height:38px;min-width:38px;flex-basis:38px}
+  header.wrap>.brand .brand-name{font-size:17px;letter-spacing:-.35px}
+  header.wrap>.cb-site-nav{order:3;display:flex;flex:1 0 100%;width:100%;max-width:100%;min-width:0;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;white-space:nowrap;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  header.wrap>.cb-site-nav::-webkit-scrollbar{display:none}
+  header.wrap>.cb-site-nav a{flex:0 0 auto}
+}
+
 </style>
 </head><body>
 <header class="wrap"><a class="brand" href="index.html"><img class="brand-logo" src="./logo.svg?v=2" alt="" width="40" height="40"> <span class="brand-name">CREATORBOOST</span></a><nav class="cb-site-nav" aria-label="Main navigation"><a href="news.html">Newsroom</a><a href="live.html">Live Hub</a><a href="gear.html" aria-current="page">Gaming Gear</a><a href="reader.html">My Reads</a><a href="membership.html">Membership</a><a href="newsroom-admin.html">Admin Panel</a></nav></header>
